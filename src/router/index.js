@@ -3,7 +3,13 @@ import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 
 Vue.use(VueRouter);
-
+/**
+ * 重写路由的push方法防止点击同一个路由报错
+ */
+const routerPush = VueRouter.prototype.push;
+VueRouter.prototype.push = function push(location) {
+    return routerPush.call(this, location).catch((error) => error);
+};
 const routes = [{
         path: '',
         redirect: '/home',
@@ -12,6 +18,25 @@ const routes = [{
         path: '/home',
         name: 'Home',
         component: Home,
+        props: { searchString: '' },
+    },
+    {
+        path: '/singleblog/:id',
+        name: 'singleblog',
+        component: () =>
+            import ( /* webpackChunkName: "about" */ '../views/SingleBlog.vue'),
+    },
+    {
+        path: '/login',
+        name: 'login',
+        component: () =>
+            import ( /* webpackChunkName: "about" */ '../views/Login.vue'),
+    },
+    {
+        path: '/register',
+        name: 'register',
+        component: () =>
+            import ( /* webpackChunkName: "about" */ '../views/Register.vue'),
     },
     {
         path: '/about',
@@ -21,12 +46,6 @@ const routes = [{
         // which is lazy-loaded when the route is visited.
         component: () =>
             import ( /* webpackChunkName: "about" */ '../views/About.vue'),
-    },
-    {
-        path: '/tag',
-        name: 'Tag',
-        component: () =>
-            import ('../views/Tag.vue'),
     },
     {
         path: '/profile',

@@ -21,9 +21,30 @@
             </li>
           </ul>
         </div>
-        <div class="logbt">
-          <button class="btn">登陆</button>
-          <button class="btn">注册</button>
+        <div class="search-box">
+          <input
+            class="search-box_ins"
+            placeholder="请搜索..."
+            v-model="content"
+          />
+          <i class="icon">
+            <svg
+              class="Zi Zi--Search SearchBar-searchIcon"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+            >
+              <path
+                d="M17.068 15.58a8.377 8.377 0 0 0 1.774-5.159 8.421 8.421 0 1 0-8.42 8.421 8.38 8.38 0 0 0 5.158-1.774l3.879 3.88c.957.573 2.131-.464 1.488-1.49l-3.879-3.878zm-6.647 1.157a6.323 6.323 0 0 1-6.316-6.316 6.323 6.323 0 0 1 6.316-6.316 6.323 6.323 0 0 1 6.316 6.316 6.323 6.323 0 0 1-6.316 6.316z"
+                fill-rule="evenodd"
+              ></path>
+            </svg>
+          </i>
+        </div>
+        <div class="btn">
+          <button class="Button" @click="login()">登陆</button>
+          <button class="Button" @click="register()">注册</button>
         </div>
       </div>
     </el-header>
@@ -38,44 +59,83 @@
 <script>
 export default {
   name: 'app',
-  components: {}
-}
+  components: {},
+  data() {
+    return {
+      content: '',
+    };
+  },
+  watch: {
+    content: function(newValue, oldValue) {
+      if (oldValue == '') {
+        this.$route.matched[0].props.default.searchString = oldValue;
+      } else {
+        this.$route.matched[0].props.default.searchString = newValue;
+      }
+    },
+  },
+  methods: {
+    login() {
+      this.$router.push({ path: '/login' });
+    },
+    register() {
+      this.$router.push({ path: '/register' });
+    },
+  },
+};
 </script>
 
 <style>
+* {
+  margin: 0;
+  padding: 0;
+  outline: none;
+}
 .maintab {
   margin-left: 90px;
 }
-.nav {
-  display: flex;
-  margin: 0;
+.el-header {
+  min-width: 1032px;
+  overflow: hidden;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  right: 0;
   padding: 0;
-
-  align-items: center;
   background-color: #444;
 }
-.logbt {
-  position: absolute;
-  right: 50px;
+.nav {
+  display: flex;
+  width: 1000px;
+  margin: 0 150px 0;
+  align-items: center;
 }
 .btn {
-  border: olivedrab solid 1px;
-  border-radius: 0 5em;
+  margin-left: 20px;
+}
+.Button {
+  margin-left: 16px;
+  padding: 0 16px;
+  font-size: 14px;
+  line-height: 32px;
+  color: wheat;
+  text-align: center;
   cursor: pointer;
+  background: none;
+  border: 1px solid;
+  border-radius: 3px;
 }
-.el-header {
-  padding: 0;
+.Button:hover {
+  color: tomato;
 }
-.el-aside {
-  position: absolute;
-  left: 0;
-  width: 100ox;
+ul {
+  display: flex;
 }
-ul li {
+ul,
+li {
   display: inline-block;
 }
 li a {
-  display: block;
   border-radius: 0.5em;
   color: white;
   text-align: center;
@@ -85,11 +145,36 @@ li a {
 li a:hover {
   background-color: #888;
 }
+.el-main {
+  margin-top: 60px;
+}
 .el-footer {
   position: absolute;
   bottom: 0;
 }
 .list {
   margin-left: 10px;
+}
+.search-box {
+  display: flex; /*使用flew布局，排列图标和输入框*/
+  align-items: center;
+  box-sizing: border-box;
+}
+.search-box input {
+  margin-left: 100px;
+  flex: 1;
+  height: 30px;
+  line-height: 30px;
+  border-radius: 6px;
+  color: black;
+  /* background-color: #ccc; */
+}
+.icon {
+  margin: 5px 0 0 -25px;
+}
+/*输入框默认内容样式*/
+::-webkit-input-placeholder {
+  color: #ccc;
+  font-size: 12px;
 }
 </style>
