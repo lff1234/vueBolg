@@ -1,61 +1,137 @@
 <template>
   <div class="login">
-    <form id="form" method="post">
-      <div class="form-signin">
-        <!--<h2 class="form-signin-heading">注册</h2>-->
-        <!-- class="sr-only"将label标签隐藏 -->
-        <label for="exampleInputUsername" class="sr-only">用户名</label>
-        <!-- 会忽略所有表单元素的value、checked、selected特性的初始值，而总是将Vue实例的数据作为数据来源 -->
-        <el-input
-          v-model="formObj.username"
-          id="exampleInputUsername"
-          name="username"
-          placeholder="用户名"
-        ></el-input>
-        <label for="exampleInputUsername" class="sr-only">密码</label>
-        <el-input
-          type="password"
-          class="form-control"
-          v-model="formObj.password"
-          id="exampleInputPassword"
-          name="password"
-          placeholder="密码"
-        ></el-input>
-        <el-checkbox>记住密码</el-checkbox>
-
-        <button @click="userLogin()" type="button">登陆</button>
+    <div class="mengceng">
+      <!--flex弹性盒子模型，justify-content：主抽 -->
+      <div class="usrlog">
+        <el-card>
+          <span class="text">欢迎登陆</span>
+          <table>
+            <tr>
+              <td>用户名</td>
+              <td>
+                <el-input v-model="user.username" placeholder="请输入用户名"></el-input>
+              </td>
+            </tr>
+            <tr>
+              <td>密码</td>
+              <td>
+                <el-input
+                  type="password"
+                  v-model="user.password"
+                  placeholder="请输入密码"
+                  @keydown.enter.native="doLogin"
+                ></el-input>
+                <!-- @keydown.enter.native="doLogin"当按下enter键的时候也会执行doLogin方法-->
+              </td>
+            </tr>
+            <tr>
+              <!-- 占两行-->
+              <td colspan="2">
+                <!-- 点击事件的两种不同的写法v-on:click和 @click-->
+                <!--<el-button style="width: 300px" type="primary" v-on:click="doLogin">登录</el-button>-->
+                <el-button style="width: 300px" type="primary" @click="doLogin">登录</el-button>
+              </td>
+            </tr>
+          </table>
+        </el-card>
+        <button class="closeButton" @click="cancelLogin()">
+          <svg
+            class="Zi Zi--Close Modal-closeIcon"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+          >
+            <path
+              d="M13.486 12l5.208-5.207a1.048 1.048 0 0 0-.006-1.483 1.046 1.046 0 0 0-1.482-.005L12 10.514 6.793 5.305a1.048 1.048 0 0 0-1.483.005 1.046 1.046 0 0 0-.005 1.483L10.514 12l-5.208 5.207a1.048 1.048 0 0 0 .006 1.483 1.046 1.046 0 0 0 1.482.005L12 13.486l5.207 5.208a1.048 1.048 0 0 0 1.483-.006 1.046 1.046 0 0 0 .005-1.482L13.486 12z"
+              fill-rule="evenodd"
+            />
+          </svg>
+        </button>
       </div>
-    </form>
+    </div>
   </div>
 </template>
 
 <script>
-import { request } from '../network/request';
 export default {
   name: 'login',
   data() {
     return {
-      formObj: { username: '', password: '' },
-      test: '',
-    };
+      user: {
+        username: '',
+        password: ''
+      },
+      test: ''
+    }
   },
   methods: {
-    userLogin() {
-      request({
-        methods: 'POST',
-        url: 'http://localhost:8081/api/login',
-        data: this.formObj,
-      }).then((res) => {
-        // this.test = res
-        console.log(res);
-      });
+    doLogin() {
+      this.$store
+        .dispatch('Login', this.user)
+        .then(res => {
+          this.$router.go(-1)
+        })
+        .catch(err => {
+          console.log(err)
+        })
     },
-  },
-};
+
+    cancelLogin() {
+      this.$router.push({
+        path: '/home'
+      })
+    }
+  }
+}
 </script>
 
 <style scoped>
-.login {
+.mengceng {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 203;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(26, 26, 26, 0.65);
+}
+
+.usrlog {
+  width: 400px;
+  height: 228px;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  top: 50%;
+  left: 50%;
+  margin-left: -200px;
+  margin-top: -114px;
+  z-index: 1;
+}
+
+.text {
+  height: 20px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 20px;
+}
+
+table {
+  border-spacing: 0px 10px;
+}
+
+.closeButton {
+  position: absolute;
+  top: -9px;
+  right: -20px;
+  padding: 12px;
+  background-color: transparent;
+  color: aliceblue;
+  border: none;
+  cursor: pointer;
 }
 </style>

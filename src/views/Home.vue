@@ -3,10 +3,15 @@
     <ul>
       <li v-for="item in filterArtical" :key="item.id">
         <div class="item-content">
-          <router-link class="title" :to="{ path: `/singleblog/${item.id}` }">{{
-            item.title
-          }}</router-link>
-          <p>{{ item.body }}</p>
+          <router-link class="title" :to="{ path: `/home/${item.id}` }">{{ item.title }}</router-link>
+          <div class="oneline">{{ item.body }}</div>
+          <div class="item-action">
+            <span>发布时间：2020-08-08</span>
+            <div class="interval"></div>
+            <span>标签：vue.js</span>
+            <div class="interval"></div>
+            <span>作者：vue.js</span>
+          </div>
         </div>
       </li>
     </ul>
@@ -15,88 +20,109 @@
 
 <script>
 // @ is an alias to /src
-import { request } from '../network/request';
-import Tag from './Tag';
+import { request } from '../network/request'
+import Tag from './Tag'
 
 export default {
   name: 'Home',
   components: {},
   props: {
     searchString: {
-      type: String,
-    },
+      type: String
+    }
   },
   data() {
     return {
-      list: [],
-    };
+      list: []
+    }
   },
   created() {
+    // console.log('创建成功')
     request({
-      url: '/posts',
+      url: '/api/home'
     })
-      .then((data) => {
+      .then(data => {
+        // console.log(data);
         for (let key in data) {
-          this.list.push(data[key]);
+          this.list.push(data[key])
         }
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .catch(err => {
+        console.log(err)
+      })
   },
 
   computed: {
     filterArtical: function() {
-      let searchStrings = this.searchString.trim();
-      let articles_array = this.list;
+      let searchStrings = this.searchString.trim()
+      // console.log(searchStrings)
+
+      let articles_array = this.list
       // console.log(this.searchString);
       if (!searchStrings) {
         // this.$nextTick()
-        return this.list;
+        return this.list
       }
 
       articles_array = articles_array.filter(function(item) {
         if (item.title.indexOf(searchStrings) !== -1) {
-          return item;
+          return item
         }
-      });
-      return articles_array;
-    },
-  },
-};
+      })
+      return articles_array
+    }
+  }
+}
 </script>
 <style>
+.interval {
+  float: left;
+  width: 1px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  margin-top: 6px;
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+.oneline {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  -webkit-text-overflow: ellipsis;
+  /* safari浏览器 */
+  -o-text-overflow: ellipsis;
+  /* opera浏览器 */
+}
+
 .home ul {
   display: flex;
   margin: 0 auto;
   flex-direction: column;
 }
+
 .home li {
-  margin: 5px 150px;
-  padding: 16px 20px;
+  margin: 5px;
+  padding: 16px;
   background-color: blanchedalmond;
 }
-.item-content {
-  width: 100%;
 
+.item-content {
+  /* width: 100%; */
   padding: 16px 20px;
 }
 
 .title {
+  font-weight: 700;
   display: block;
   padding: 0;
   margin-bottom: 10px;
   text-align: start;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  -webkit-text-overflow: ellipsis;
-  /* safari浏览器 */
-  -o-text-overflow: ellipsis;
-  /* opera浏览器 */
   text-decoration: none;
   color: black;
 }
+
 .title:hover {
   text-decoration: underline;
   cursor: pointer;

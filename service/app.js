@@ -1,17 +1,60 @@
 // 创建express服务器
 const express = require('express');
+
+const path = require('path');
 const app = express();
-//引入mongoose，进行数据库的连接
 const mongoose = require('./util/mongoose');
 const db = mongoose();
+const vertoken = require('./util/token_vertify');
+const expressJwt = require('express-jwt');
+const router = require('./router/index.js');
 // 注册解析 表单数据的 body-parser
 const bodyParser = require('body-parser');
-// 将请求响应设置content-type设置为application/json
-const router = require('./router.js');
+// // const services = require('./api/userApi.js');
+// // 将请求响应设置content-type设置为application/json
+
+// 解析token获取用户信息
+app.use(function(req, res, next) {
+    let token = req.headers['authorization'];
+    console.log(token);
+    if (token == undefined) {
+        return next();
+    } else {
+        vertoken
+            .verToken(token)
+            .then(data => {
+                // req.data = data;
+                console.log(data);
+                return next();
+            })
+            .catch(error => {
+                return next();
+            });
+    }
+});
+
+//验证token是否过期并规定哪些路由不用验证
+app.use(
+    expressJwt({
+        secret: 'token_secret', // 密匙
+        algorithms: ['HS256']
+    }).unless({
+        path: [/[^/home/.*]/, '/home'] //除了这个地址，其他的URL都需要验证
+    })
+);
+
+// // app.use(express.static(path.join(__dirname, 'api')));
+
+//当token失效返回提示信息
+app.use(function(err, req, res, next) {
+    if (err.status == 401) {
+        return res.status(401).send('token失效');
+    }
+});
 app.use('/api/*', function(req, res, next) {
     // 设置请求头为允许跨域
-    console.log(req.headers.origin);
-    res.header('Access-Control-Allow-Origin', req.headers.origin);
+    // console.log(req.headers.origin);
+    res.header('Access-Control-Allow-Origin', '*');
     // 设置服务器支持的所有头信息字段
     res.header(
         'Access-Control-Allow-Headers',
@@ -28,8 +71,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 // 配置路由
 app.use(router);
-
+app.get('/', (req, res) => {
+    res.send('123');
+});
+// app.post('/login', services.login);
 // 服务器已经启动
-app.listen('8100', function() {
+app.listen('8700', function() {
     console.log('running...');
 });

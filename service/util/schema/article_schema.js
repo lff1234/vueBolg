@@ -1,2 +1,3 @@
 const mongoose = require('mongoose');
-const Article = mongoose.Schema({ uesrid: String, id: String }, { collections: 'article' });
+const articleSchema = new mongoose.Schema({ uesrid: Number, id: Number, title: String, body: String }, { collection: 'article' });
+module.exports = mongoose.model('Article', articleSchema);
