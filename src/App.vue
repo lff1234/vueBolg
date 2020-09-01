@@ -22,7 +22,11 @@
           </ul>
         </div>
         <div class="search-box">
-          <input class="search-box_ins" placeholder="请搜索..." v-model="content" />
+          <input
+            class="search-box_ins"
+            placeholder="请搜索..."
+            v-model="content"
+          />
           <i class="icon">
             <svg
               class="Zi Zi--Search SearchBar-searchIcon"
@@ -43,19 +47,17 @@
           <button class="Button" @click="register()">注册</button>
         </div>
         <div class="userHome" v-show="isLogin()">
-          <el-avatar :size="50" :src="userImg"></el-avatar>
+          <el-avatar :size="40" :src="userImg"></el-avatar>
           <span class="logOut" @click="logOut()">[退出]</span>
         </div>
       </div>
     </el-header>
 
     <el-main>
-      <router-view></router-view>
-
-      <!-- <keep-alive>
+      <keep-alive>
         <router-view v-if="this.$route.meta.keepAlive"></router-view>
       </keep-alive>
-      <router-view v-if="!this.$route.meta.keepAlive"></router-view>-->
+      <router-view v-if="!this.$route.meta.keepAlive"></router-view>
     </el-main>
     <el-footer></el-footer>
   </el-container>
@@ -68,41 +70,43 @@ export default {
   data() {
     return {
       content: '',
-      userImg:
-        'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+      userImg: localStorage.getItem('avator')
       // isLogin: this.$store.getters.isLoggedIn
-    }
+    };
   },
   watch: {
     content: function(newValue, oldValue) {
-      this.$route.matched[0].props.default.searchString = newValue
+      // console.log(typeof newValue)
+      // console.log(this.$route.matched[0].props.default)
+      this.$route.matched[0].props.default.searchString = newValue;
+      // console.log(this.$route.matched[0].props.default)
     }
   },
   methods: {
     isLogin() {
       // console.log(this.$store.getters.isLoggedIn)
-      return this.$store.getters.isLoggedIn
+      return this.$store.getters.isLoggedIn;
     },
     login() {
       this.$router.push({
         path: '/login'
-      })
+      });
     },
     register() {
       this.$router.push({
         path: '/register'
-      })
+      });
     },
     logOut() {
       this.$store.dispatch('LogOut').then(res => {
-        alert(res)
+        alert(res);
         //跳转到登录页面
-        console.log(this.$store.getters.isLoggedIn)
-        this.$router.push('/login')
-      })
+        // console.log(this.$store.getters.isLoggedIn)
+        // this.$router.push('/login')
+      });
     }
   }
-}
+};
 </script>
 
 <style>
@@ -213,6 +217,7 @@ li a:hover {
 }
 
 .search-box input {
+  /* width: 100px; */
   margin-left: 100px;
   flex: 1;
   height: 30px;
@@ -230,5 +235,20 @@ li a:hover {
 ::-webkit-input-placeholder {
   color: #ccc;
   font-size: 12px;
+}
+.userHome {
+  margin-left: 20px;
+  margin-top: 5px;
+}
+.userHome img {
+  cursor: pointer;
+}
+.logOut {
+  margin-left: 5px;
+  color: wheat;
+}
+.logOut:hover {
+  cursor: pointer;
+  color: red;
 }
 </style>

@@ -70,7 +70,7 @@ export default {
       this.$store
         .dispatch('Login', this.user)
         .then(res => {
-          this.$router.go(-1)
+          this.$router.push({ path: '/home' })
         })
         .catch(err => {
           console.log(err)

@@ -7,7 +7,9 @@ exports.setToken = function(user) {
                 name: user.username,
                 _id: user._id
             },
-            signkey, { expiresIn: '0.01h' }
+            signkey, {
+                expiresIn: '0.1h'
+            }
         );
         resolve(token);
     });
@@ -16,7 +18,7 @@ exports.setToken = function(user) {
 exports.verToken = function(token) {
     return new Promise((resolve, reject) => {
         var info = jwt.verify(token.split(' ').pop(), signkey);
-        console.log(info);
+        // console.log(info);
         resolve(info);
     });
 };

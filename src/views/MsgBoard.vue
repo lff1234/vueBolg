@@ -6,16 +6,10 @@
 export default {
   name: 'addBlog',
   data() {
-    return {};
+    return {}
   },
-  computed: {
-    blogList() {
-      return this.blogs.filter((blog) => {
-        return blog.title.match(this.search);
-      });
-    },
-  },
-};
+  computed: {}
+}
 </script>
 
 <style scoped></style>

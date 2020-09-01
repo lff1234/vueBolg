@@ -42,9 +42,9 @@ export default {
       url: '/api/home'
     })
       .then(data => {
-        // console.log(data);
-        for (let key in data) {
-          this.list.push(data[key])
+        // console.log(data)
+        for (let val of data) {
+          this.list.push(val)
         }
       })
       .catch(err => {
@@ -55,21 +55,20 @@ export default {
   computed: {
     filterArtical: function() {
       let searchStrings = this.searchString.trim()
-      // console.log(searchStrings)
+      // console.log(this.list)
 
       let articles_array = this.list
       // console.log(this.searchString);
       if (!searchStrings) {
         // this.$nextTick()
         return this.list
+      } else {
+        articles_array = articles_array.filter(function(item) {
+          return item.title.indexOf(searchStrings) !== -1
+          // return true
+        })
+        return articles_array
       }
-
-      articles_array = articles_array.filter(function(item) {
-        if (item.title.indexOf(searchStrings) !== -1) {
-          return item
-        }
-      })
-      return articles_array
     }
   }
 }

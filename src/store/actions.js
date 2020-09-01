@@ -13,12 +13,17 @@ export default {
                 .then(res => {
                     console.log(res);
                     const token = res.data.token;
-                    const user = res.data.userInfo;
+                    const username = res.data.userInfo.username;
+                    const logid = res.data.userInfo._id;
+                    const avator = res.data.userInfo.avator;
                     localStorage.setItem('token', token);
-                    localStorage.setItem('username', user);
-                    // 每次请求接口时，需要在headers添加对应的Token验证
+                    localStorage.setItem('username', username);
+                    localStorage.setItem('logid', logid);
+                    localStorage.setItem('avator', avator);
+                    //每次请求接口时，需要在headers添加对应的Token验证
                     axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
-                    // 更新token
+
+                    //更新token
                     commit('auth_success', token, user);
                     resolve(res);
                 })
@@ -36,10 +41,13 @@ export default {
                 })
                 .then(response => {
                     commit('logout');
+                    localStorage.clear();
                     localStorage.setItem('username', null);
                     localStorage.setItem('token', '');
+                    localStorage.removeItem('logid');
+                    localStorage.removeItem('avator');
                     // 移除之前在axios头部设置的token,现在将无法执行需要token的事务
-                    delete axios.defaults.headers.common['authorization'];
+                    delete axios.defaults.headers.common['Authorization'];
                     resolve(response);
                 })
                 .catch(error => {

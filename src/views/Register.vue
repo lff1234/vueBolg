@@ -141,7 +141,12 @@ export default {
             .then(res => {
               // this.test = res
               console.log(res)
-              this.$router.push({ path: '/login' })
+              if (res.err == '-1') {
+                alert(res.msg)
+              } else {
+                alert(res.msg + ',请登录账户')
+                this.$router.push({ path: '/login' })
+              }
             })
             .catch(err => {
               console.log(err)

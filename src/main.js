@@ -2,6 +2,7 @@ import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
 import store from './store';
+
 import {
     Container,
     Header,
@@ -13,7 +14,8 @@ import {
     Form,
     FormItem,
     Avatar,
-    Button
+    Button,
+    Message
 } from 'element-ui';
 
 Vue.use(Container);
@@ -27,8 +29,9 @@ Vue.use(Card);
 Vue.use(Form);
 Vue.use(FormItem);
 Vue.use(Avatar);
+Vue.use(Message);
 Vue.prototype.$store = store;
-
+Vue.prototype.$message = Message;
 Vue.config.productionTip = false;
 
 new Vue({

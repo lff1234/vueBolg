@@ -3,22 +3,22 @@
     <h1>{{ blog.title }}</h1>
     <article>{{ blog.body }}</article>
 
-    <div id="comment">
-      <comment />
-    </div>
+    <comment v-if="flag" :articleComment="comment" :articleId="blog._id" />
   </div>
 </template>
 
 <script>
-import { request } from '../network/request';
-import Comment from '../components/content/Comment';
+import { request } from '../network/request'
+import Comment from '../components/content/Comment'
 export default {
   name: 'singleblog',
   data() {
     return {
       blogid: this.$route.params.id,
-      blog: {}
-    };
+      blog: {},
+      comment: [],
+      flag: false
+    }
   },
   components: {
     Comment
@@ -27,13 +27,19 @@ export default {
     request({
       url: '/api/home/' + this.blogid
     })
-      .then(data => {
-        // console.log(data);
-        this.blog = data;
+      .then(res => {
+        // console.log(res)
+        this.blog = res.data.blogContent
+        this.comment = res.data.comment
+
+        this.$store.state.commentList = res.data.comment
+        // console.log(this.comment)
+        // console.log(this.$store.state.commentList)
+        this.flag = true
       })
       .catch(err => {
-        console.log(err);
-      });
+        console.log(err)
+      })
   },
   // watch: {
   //   $route(to, from) {
@@ -69,7 +75,7 @@ export default {
   // }
   // },
   methods: {}
-};
+}
 </script>
 
 <style scoped></style>

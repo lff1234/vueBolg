@@ -8,7 +8,9 @@ Vue.use(Vuex);
 const state = {
     currentUser: null,
     status: '',
-    token: localStorage.getItem('token') || ''
+    logId: localStorage.getItem('logid') || '',
+    token: localStorage.getItem('token') || '',
+    commentList: localStorage.getItem('commentList') || []
 };
 export default new Vuex.Store({
     state,

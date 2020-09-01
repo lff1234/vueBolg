@@ -14,24 +14,24 @@ const bodyParser = require('body-parser');
 // // 将请求响应设置content-type设置为application/json
 
 // 解析token获取用户信息
-app.use(function(req, res, next) {
-    let token = req.headers['authorization'];
-    console.log(token);
-    if (token == undefined) {
-        return next();
-    } else {
-        vertoken
-            .verToken(token)
-            .then(data => {
-                // req.data = data;
-                console.log(data);
-                return next();
-            })
-            .catch(error => {
-                return next();
-            });
-    }
-});
+// app.use(function(req, res, next) {
+//     let token = req.headers['authorization'];
+//     // console.log(token);
+//     if (token == undefined) {
+//         return next();
+//     } else {
+//         vertoken
+//             .verToken(token)
+//             .then(data => {
+//                 // req.data = data;
+//                 // console.log(data);
+//                 return next();
+//             })
+//             .catch(error => {
+//                 return next();
+//             });
+//     }
+// });
 
 //验证token是否过期并规定哪些路由不用验证
 app.use(
@@ -48,20 +48,26 @@ app.use(
 //当token失效返回提示信息
 app.use(function(err, req, res, next) {
     if (err.status == 401) {
+        // console.log('token失效');
         return res.status(401).send('token失效');
     }
 });
 app.use('/api/*', function(req, res, next) {
     // 设置请求头为允许跨域
-    // console.log(req.headers.origin);
-    res.header('Access-Control-Allow-Origin', '*');
+    // console.log(req.headers);
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
     // 设置服务器支持的所有头信息字段
-    res.header(
+    res.setHeader(
         'Access-Control-Allow-Headers',
         'Content-Type,Content-Length, Authorization, Accept,X-Requested-With'
     );
     // 设置服务器支持的所有跨域请求的方法
-    res.header('Access-Control-Allow-Methods', 'POST,GET');
+    res.setHeader('Access-Control-Allow-Methods', 'POST,GET');
+    // 预检的存活时间
+    res.setHeader('Access-Control-Max-Age', 6);
+    if (req.method === 'OPTIONS') {
+        res.end(); // OPTIONS请求不做任何处理
+    }
     // next()方法表示进入下一个路由
     next();
 });
@@ -70,7 +76,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // 处理json格式的参数
 app.use(bodyParser.json());
 // 配置路由
-app.use(router);
+app.use('/api', router);
 app.get('/', (req, res) => {
     res.send('123');
 });

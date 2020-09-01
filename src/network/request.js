@@ -1,15 +1,17 @@
 import axios from 'axios';
-// import store from '../store/index';
+import store from '../store/index';
 // axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8';
 export function request(config) {
     const instance = axios.create({
-        baseURL: ''
-            // timeout: 10000
+        baseURL: 'http://localhost:8700',
+        timeout: 10000
     });
     instance.interceptors.request.use(
         config => {
-            // config.headers['authorization'] =
-            //     'Bearer ' + window.localStorage.getItem('token');
+            if (window.localStorage.getItem('token')) {
+                config.headers['authorization'] =
+                    'Bearer ' + window.localStorage.getItem('token');
+            }
             // console.log(config);
             return config;
         },
@@ -28,7 +30,7 @@ export function request(config) {
                 switch (error.response.status) {
                     case 401:
                         store.dispatch('LogOut');
-                        alert('请重新登录');
+                        // alert('请重新登录');
                         // this.$router.push('/login');
                 }
                 //跳转登录

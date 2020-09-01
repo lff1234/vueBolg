@@ -1,12 +1,21 @@
 module.exports = {
-    presets: ['@vue/cli-plugin-babel/preset'],
-    plugins: [
+    presets: [
+        // '@vue/cli-plugin-babel/preset',
         [
-            'component',
+            '@vue/app',
             {
-                libraryName: 'element-ui',
-                styleLibraryName: 'theme-chalk',
-            },
-        ],
+                useBuiltIns: 'entry'
+            }
+        ]
     ],
+    plugins: [
+            [
+                'component',
+                {
+                    libraryName: 'element-ui',
+                    styleLibraryName: 'theme-chalk'
+                }
+            ]
+        ]
+        // transpileDependencies: [/node_modules[/\\\\](element-ui|vuex|)[/\\\\]/]
 };
