@@ -2,6 +2,20 @@
   <el-container>
     <el-header>
       <div class="nav">
+        <div class="sidebar-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            role="img"
+            viewBox="0 0 448 512"
+            class="icon"
+          >
+            <path
+              fill="currentColor"
+              d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"
+            />
+          </svg>
+        </div>
         <div class="maintab">
           <img src="./assets/images/show3.png" width="54px" height="55px" />
         </div>
@@ -22,11 +36,7 @@
           </ul>
         </div>
         <div class="search-box">
-          <input
-            class="search-box_ins"
-            placeholder="请搜索..."
-            v-model="content"
-          />
+          <input class="search-box_ins" placeholder="请搜索..." v-model="content" />
           <i class="icon">
             <svg
               class="Zi Zi--Search SearchBar-searchIcon"
@@ -46,7 +56,7 @@
           <button class="Button" @click="login()">登陆</button>
           <button class="Button" @click="register()">注册</button>
         </div>
-        <div class="userHome" v-show="isLogin()">
+        <div class="userHome" v-if="isLogin()">
           <el-avatar :size="40" :src="userImg"></el-avatar>
           <span class="logOut" @click="logOut()">[退出]</span>
         </div>
@@ -70,43 +80,44 @@ export default {
   data() {
     return {
       content: '',
-      userImg: localStorage.getItem('avator')
+      userImg: this.$store.state.avator
       // isLogin: this.$store.getters.isLoggedIn
-    };
+    }
   },
+
   watch: {
     content: function(newValue, oldValue) {
       // console.log(typeof newValue)
       // console.log(this.$route.matched[0].props.default)
-      this.$route.matched[0].props.default.searchString = newValue;
+      this.$route.matched[0].props.default.searchString = newValue
       // console.log(this.$route.matched[0].props.default)
     }
   },
   methods: {
     isLogin() {
       // console.log(this.$store.getters.isLoggedIn)
-      return this.$store.getters.isLoggedIn;
+      return this.$store.getters.isLoggedIn
     },
     login() {
       this.$router.push({
         path: '/login'
-      });
+      })
     },
     register() {
       this.$router.push({
         path: '/register'
-      });
+      })
     },
     logOut() {
       this.$store.dispatch('LogOut').then(res => {
-        alert(res);
+        console.log(res)
         //跳转到登录页面
         // console.log(this.$store.getters.isLoggedIn)
         // this.$router.push('/login')
-      });
+      })
     }
   }
-};
+}
 </script>
 
 <style>
@@ -118,18 +129,40 @@ export default {
 }
 
 body {
-  min-width: 1116px;
+  /* min-width: 1116px; */
   line-height: 24px;
   font-size: 16px;
   background: #f5f6f7;
 }
-
+@media screen and (max-width: 980px) {
+  .list {
+    display: none;
+  }
+}
+@media (max-width: 719px) {
+  .sidebar-button {
+    display: block;
+  }
+  .search-box_ins {
+    display: none;
+  }
+}
+.sidebar-button {
+  cursor: pointer;
+  display: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  position: absolute;
+  padding: 0.6rem;
+  top: 0.6rem;
+  left: 1rem;
+}
 .maintab {
   margin-left: 30px;
 }
 
 .el-header {
-  min-width: 1032px;
+  /* min-width: 1032px; */
   position: fixed;
   z-index: 1;
   left: 0;
@@ -140,7 +173,7 @@ body {
 
 .nav {
   display: flex;
-  min-width: 1000px;
+  max-width: 1260px;
   margin: 0 78px;
   align-items: center;
 }

@@ -21,23 +21,10 @@ exports.contentGet = async(req, res) => {
     // console.log(typeof req.params.id);
     Article.findOne({ id: parseInt(req.params.id) })
         .lean()
-        .then(data => {
-            // console.log(data);
-            blogContent = data;
-            let comment1 = blogContent.comments.map(val => {
-                return Comment.findOne({ _id: val })
-                    .lean()
-                    .then(rs => {
-                        return rs;
-                    });
-            });
-            return Promise.all(comment1);
-            // return comment1
-            // console.log(comment1);
-            // return Promise.all(comment1);
-        })
+        .populate('comments')
         .then(arr => {
-            let arr1 = arr.map(rs => {
+            blogContent = arr;
+            let arr1 = arr.comments.map(rs => {
                 return User.find({
                         _id: { $in: [rs.fromId, rs.toId] }
                     })
@@ -66,10 +53,6 @@ exports.contentGet = async(req, res) => {
 
                         return m;
                     });
-
-                // test.then(res => {
-                //     // console.log(res);
-                // });
             });
             return Promise.all(arr1);
         })
@@ -90,14 +73,12 @@ exports.contentGet = async(req, res) => {
                     parentComment.commentNum += 1;
                 }
             }
+            delete blogContent.comments;
             return res.send({
                 data: { comment: comment, blogContent: blogContent }
             });
         });
 };
-// return res.send({
-//     data: { comment: arr, blogContent: blogContent }
-// });
 
 exports.comment = async(req, res) => {
     let comment = await Comment.create({

@@ -24,7 +24,9 @@ router.get('/logout', function(req, res, next) {
 //         return res.json(data);
 //     });
 // });
-
+router.get('/tag', function(req, res, next) {
+    return res.send('好好');
+});
 // 登录功能
 router.post('/login', services.login);
 // 注册功能

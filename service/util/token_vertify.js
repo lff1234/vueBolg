@@ -1,5 +1,5 @@
-var jwt = require('jsonwebtoken');
-var signkey = 'token_secret'; // 密匙
+const jwt = require('jsonwebtoken');
+const signkey = 'token_secret'; // 密匙
 
 exports.setToken = function(user) {
     return new Promise((resolve, reject) => {

@@ -70,7 +70,8 @@ export default {
       this.$store
         .dispatch('Login', this.user)
         .then(res => {
-          this.$router.push({ path: '/home' })
+          this.$router.go(-1)
+          // this.$router.push({ path: '/home' })
         })
         .catch(err => {
           console.log(err)
@@ -78,9 +79,10 @@ export default {
     },
 
     cancelLogin() {
-      this.$router.push({
-        path: '/home'
-      })
+      this.$router.go(-1)
+      // this.$router.push({
+      //   path: '/home'
+      // })
     }
   }
 }

@@ -32,7 +32,11 @@ const commentSchema = new mongoose.Schema({
         // type: String
         type: mongoose.Schema.Types.ObjectId,
         default: mongoose.Types.ObjectId()
-    }
+    },
+    users: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }]
 });
 // { collection: 'comment' }
 module.exports = mongoose.model('Comment', commentSchema, 'comment');

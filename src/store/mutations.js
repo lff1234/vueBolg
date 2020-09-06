@@ -1,13 +1,14 @@
-import { stat } from 'fs';
-
 export default {
     auth_request(state) {
         state.status = 'loading';
     },
-    auth_success(state, token, user) {
+    auth_success(state, token, username, logid, avator) {
         state.status = 'success';
         state.token = token;
-        state.currentUser = user;
+        state.currentUser = username;
+        state.logId = logid;
+
+        state.avator = avator;
     },
     auth_error(state) {
         state.status = 'error';
@@ -15,5 +16,8 @@ export default {
     logout(state) {
         state.status = '';
         state.token = '';
+    },
+    UpdateCommentList(state, comment) {
+        state.commentList = comment;
     }
 };

@@ -4,7 +4,7 @@ export default {
     Login({ commit }, user) {
         return new Promise((resolve, reject) => {
             commit('auth_request');
-            // 向后端发送请求，验证用户名密码是否正确，请求成功接收后端返回的token值，利用commit修改store的state属性，并将token存放在localStorage中
+            // 向后端发送请求，验证用户名密码是否正确，请求成功接收后端返回的token值，利用commit修改store的state属性，并将token存放在sessionStorage中
             request({
                     method: 'post',
                     url: '/api/login',
@@ -16,20 +16,20 @@ export default {
                     const username = res.data.userInfo.username;
                     const logid = res.data.userInfo._id;
                     const avator = res.data.userInfo.avator;
-                    localStorage.setItem('token', token);
-                    localStorage.setItem('username', username);
-                    localStorage.setItem('logid', logid);
-                    localStorage.setItem('avator', avator);
+                    sessionStorage.setItem('token', token);
+                    sessionStorage.setItem('username', username);
+                    sessionStorage.setItem('logid', logid);
+                    sessionStorage.setItem('avator', avator);
                     //每次请求接口时，需要在headers添加对应的Token验证
                     axios.defaults.headers.common['authorization'] = 'Bearer ' + token;
 
                     //更新token
-                    commit('auth_success', token, user);
+                    commit('auth_success', token, username, logid, avator);
                     resolve(res);
                 })
                 .catch(err => {
                     commit('auth_error');
-                    localStorage.removeItem('token');
+                    sessionStorage.removeItem('token');
                     reject(err);
                 });
         });
@@ -41,11 +41,12 @@ export default {
                 })
                 .then(response => {
                     commit('logout');
-                    localStorage.clear();
-                    localStorage.setItem('username', null);
-                    localStorage.setItem('token', '');
-                    localStorage.removeItem('logid');
-                    localStorage.removeItem('avator');
+                    // localStorage.clear();
+                    sessionStorage.clear();
+                    // sessionStorage.setItem('username', null);
+                    // sessionStorage.setItem('token', '');
+                    // sessionStorage.removeItem('logid');
+                    // sessionStorage.removeItem('avator');
                     // 移除之前在axios头部设置的token,现在将无法执行需要token的事务
                     delete axios.defaults.headers.common['Authorization'];
                     resolve(response);

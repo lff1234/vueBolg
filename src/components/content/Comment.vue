@@ -1,6 +1,6 @@
 <template>
   <div id="comment">
-    <div v-clickoutside="hideReplyBtn" @click="inputFocus" class="my-reply">
+    <div v-clickoutside="hideReplyBtn" @click.stop.stop="inputFocus()" class="my-reply">
       <el-avatar class="header-img" :size="40" :src="myHeader"></el-avatar>
       <div class="reply-info">
         <div
@@ -15,7 +15,7 @@
         ></div>
       </div>
       <div class="reply-btn-box" v-show="btnShow">
-        <el-button class="reply-btn" size="medium" @click="sendComment" type="primary">发表评论</el-button>
+        <el-button class="reply-btn" size="medium" @click.stop="sendComment" type="primary">发表评论</el-button>
       </div>
     </div>
     <div v-for="(item, i) in comments" :key="i" class="author-title reply-father">
@@ -25,28 +25,28 @@
         <span class="author-time">{{ dateStr(item.time) }}</span>
       </div>
       <div class="icon-btn">
-        <span @click="showReplyInput(i, item.fromName, item.fromId)">
+        <span @click.stop="showReplyInput(i, item.fromName, item.fromId)">
           <i class="iconfont el-icon-chat-dot-round"></i>
           回复({{ item.commentNum }})
         </span>
-        <span @click="likeClick(item,i)">
+        <span @click.stop="likeClick(item,i)">
           <i class="iconfont">
             <img
               class="like-icon"
-              v-show="item.isLike"
+              v-show="!item.isLike"
               id="is-like-imgactive"
-              src="https://csdnimg.cn/release/phoenix/template/new_img/tobarThumbUpactive.png"
-              width="20px"
-              height="20px"
+              src="https://blog.csdn.net/static_files/template/new_img/commentUnHeart.png"
+              width="15px"
+              height="15px"
               alt
             />
             <img
               class="like-icon"
-              v-show="!item.isLike"
+              v-show="item.isLike"
               id="is-like-img"
-              src="https://csdnimg.cn/release/phoenix/template/new_img/tobarThumbUp.png"
-              width="20px"
-              height="20px"
+              src="https://blog.csdn.net/static_files/template/new_img/commentActiveHeart.png"
+              width="15px"
+              height="15px"
               alt
             />
           </i>
@@ -61,48 +61,53 @@
         </p>
       </div>
       <div class="reply-box">
-        <div v-for="(reply, j) in item.reply" :key="j" class="author-title">
-          <el-avatar class="header-img" :size="40" :src="reply.fromHeadImg"></el-avatar>
-          <div class="author-info">
-            <span class="author-name">{{ reply.fromName }}</span>
-            <span class="author-time">{{ dateStr(reply.time) }}</span>
+        <div v-for="(reply, j) in item.reply" :key="j">
+          <div v-if="!pullDown || j < 3" class="author-title">
+            <el-avatar class="header-img" :size="40" :src="reply.fromHeadImg"></el-avatar>
+            <div class="author-info">
+              <span class="author-name">{{ reply.fromName }}</span>
+              <span class="author-time">{{ dateStr(reply.time) }}</span>
+            </div>
+            <div class="icon-btn">
+              <span @click.stop="showReplyInput(i, reply.fromName, reply.fromId)">
+                <i class="iconfont el-icon-chat-dot-round"></i>
+                回复
+              </span>
+              <span @click.stop="likeClick(reply,i,j)">
+                <i class="iconfont">
+                  <img
+                    class="like-icon"
+                    v-show="reply.isLike"
+                    id="is-like-imgactive"
+                    src="https://csdnimg.cn/release/phoenix/template/new_img/tobarThumbUpactive.png"
+                    width="20px"
+                    height="20px"
+                    alt
+                  />
+                  <img
+                    class="like-icon"
+                    v-show="!reply.isLike"
+                    id="is-like-img"
+                    src="https://csdnimg.cn/release/phoenix/template/new_img/tobarThumbUp.png"
+                    width="20px"
+                    height="20px"
+                    alt
+                  />
+                </i>
+                <span class="like-num">{{reply.like > 0 ? reply.like + '人赞' : '点赞'}}</span>
+              </span>
+            </div>
+            <div class="talk-box">
+              <p>
+                <span>回复 {{ reply.toName }}:</span>
+                <span class="reply">{{ reply.content }}</span>
+              </p>
+            </div>
           </div>
-          <div class="icon-btn">
-            <span @click="showReplyInput(i, reply.fromName, reply.fromId)">
-              <i class="iconfont el-icon-chat-dot-round"></i>
-              回复
-            </span>
-            <span @click="likeClick(reply,i,j)">
-              <i class="iconfont">
-                <img
-                  class="like-icon"
-                  v-show="reply.isLike"
-                  id="is-like-imgactive"
-                  src="https://csdnimg.cn/release/phoenix/template/new_img/tobarThumbUpactive.png"
-                  width="20px"
-                  height="20px"
-                  alt
-                />
-                <img
-                  class="like-icon"
-                  v-show="!reply.isLike"
-                  id="is-like-img"
-                  src="https://csdnimg.cn/release/phoenix/template/new_img/tobarThumbUp.png"
-                  width="20px"
-                  height="20px"
-                  alt
-                />
-              </i>
-              <span class="like-num">{{reply.like > 0 ? reply.like + '人赞' : '点赞'}}</span>
-            </span>
-          </div>
-          <div class="talk-box">
-            <p>
-              <span>回复 {{ reply.toName }}:</span>
-              <span class="reply">{{ reply.content }}</span>
-            </p>
-          </div>
-          <div class="reply-box"></div>
+        </div>
+        <div class="comment-rest" v-if="item.reply.length > 3">
+          <span v-if="pullDown" @click.stop="setPullDown(false)">显示全部{{item.reply.length}}条</span>
+          <span v-else @click="setPullDown(true)">收起评论</span>
         </div>
       </div>
       <div v-show="_inputShow(i)" class="my-reply my-comment-reply">
@@ -115,13 +120,14 @@
             :placeholder="replyed"
             @input="onDivInput($event)"
             class="reply-input reply-comment-input"
+            v-focus="comments[i].inputShow"
           ></div>
         </div>
         <div class="reply-btn-box">
           <el-button
             class="reply-btn"
             size="medium"
-            @click="sendCommentReply(i)"
+            @click.stop="sendCommentReply(i)"
             type="primary"
           >发表评论</el-button>
         </div>
@@ -130,8 +136,10 @@
   </div>
 </template>
 
+
 <script>
 import { request } from '../../network/request'
+
 const clickoutside = {
   // 初始化指令
   bind(el, binding, vnode) {
@@ -171,39 +179,67 @@ export default {
       index: '0',
       replyComment: '',
       myName: '',
-      myHeader: localStorage.getItem('avator'),
+      myHeader: sessionStorage.getItem('avator'),
       myId: 1,
       to: '',
       toId: -1,
-      comments: this.articleComment
+      comments: this.articleComment,
+      pullDown: true
+      // focusState: false
     }
   },
   // created() {
-  //   if (localStorage.getItem('commentList')) {
-  //     this.comments = localStorage.getItem('commentList')
+  //   if (sessionStorage.getItem('commentList')) {
+  //     this.comments = sessionStorage.getItem('commentList')
   //     console.log('ok')
   //   }
   // },
   directives: {
-    clickoutside
+    clickoutside,
+    focus: {
+      update(el, binding) {
+        // console.log(el)
+        if (binding.value) {
+          el.focus()
+          el.scrollIntoView()
+        }
+      }
+    }
   },
   created() {
-    if (localStorage.getItem(this.$route.params.id)) {
-      this.comments = JSON.parse(localStorage.getItem(this.$route.params.id))
+    if (sessionStorage.getItem(this.$route.params.id)) {
+      this.comments = JSON.parse(sessionStorage.getItem(this.$route.params.id))
       this.$store.state.commentList = this.comments
       // console.log('ok')
     }
   },
   mounted() {
     window.onbeforeunload = () => {
-      // localStorage.removeItem('commentList')
-      localStorage.setItem(
+      // sessionStorage.removeItem('commentList')
+      sessionStorage.setItem(
         this.$route.params.id,
         JSON.stringify(this.$store.state.commentList)
       )
     }
+
+    document.onclick = e => {
+      // console.log(e.target.className.indexOf('reply-input'))
+      if (e.target.className.indexOf('reply-input') == -1) {
+        for (let item of this.comments) {
+          // console.log(this.comments.inputShow)
+          // console.log(item)
+          item.inputShow = false
+        }
+      }
+    }
+  },
+  destroyed() {
+    document.onclick = null
   },
   methods: {
+    setPullDown(data) {
+      this.pullDown = data
+    },
     likeClick(item, i) {
       if (item.isLike === null) {
         this.$set(item, 'isLike', true)
@@ -236,16 +272,25 @@ export default {
       this.$store.state.commentList[i].reply[j] = item
       // console.log(this.$store.state.commentList)
 
-      // localStorage.setItem(
+      // sessionStorage.setItem(
       //   'commentList',
       //   JSON.stringify(this.$store.state.commentList)
       // )
     },
     inputFocus() {
-      let replyInput = document.getElementById('replyInput')
-      replyInput.style.padding = '8px 8px'
-      replyInput.style.border = '2px solid blue'
-      replyInput.focus()
+      if (!this.$store.state.logId) {
+        this.$message({
+          showClose: true,
+          type: 'warning',
+          message: '请先登录哦'
+        })
+        this.$router.push('/login')
+      } else {
+        let replyInput = document.getElementById('replyInput')
+        replyInput.style.padding = '8px 8px'
+        replyInput.style.border = '2px solid blue'
+        replyInput.focus()
+      }
     },
     showReplyBtn() {
       this.btnShow = true
@@ -256,7 +301,7 @@ export default {
       replyInput.style.border = 'none'
     },
     showReplyInput(i, name, id) {
-      // console.log(id)
+      // console.log(window.sessionStorage.getItem('logid'))
       if (!this.$store.state.logId) {
         this.$message({
           showClose: true,
@@ -370,6 +415,7 @@ export default {
     },
     onDivInput: function(e) {
       this.replyComment = e.target.innerHTML
+      // e.cancelBubble = true
     },
     dateStr(date) {
       //获取js 时间戳
@@ -486,8 +532,8 @@ export default {
       cursor: pointer
     .iconfont
       margin: 0 5px
-    .like-icon
-      vertical-align: -15%
+      .like-icon
+        vertical-align: 0.02em
   .talk-box
     margin: 0 50px
     >p

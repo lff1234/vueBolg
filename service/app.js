@@ -39,7 +39,12 @@ app.use(
         secret: 'token_secret', // 密匙
         algorithms: ['HS256']
     }).unless({
-        path: [/[^/home/.*]/, '/home'] //除了这个地址，其他的URL都需要验证
+        path: [
+                { url: /^\/api\/home(\/\d{1,})?/, methods: ['GET'] },
+                '/api/logout',
+                '/api/login',
+                '/api/tag'
+            ] //除了这个地址，其他的URL都需要验证
     })
 );
 
@@ -55,12 +60,14 @@ app.use(function(err, req, res, next) {
 app.use('/api/*', function(req, res, next) {
     // 设置请求头为允许跨域
     // console.log(req.headers);
-    res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+    // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
     // 设置服务器支持的所有头信息字段
     res.setHeader(
         'Access-Control-Allow-Headers',
         'Content-Type,Content-Length, Authorization, Accept,X-Requested-With'
     );
+    // 允许携带cookie
+    //  res.setHeader('Access-Control-Allow-Credentials', true)
     // 设置服务器支持的所有跨域请求的方法
     res.setHeader('Access-Control-Allow-Methods', 'POST,GET');
     // 预检的存活时间

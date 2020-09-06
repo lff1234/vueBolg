@@ -1,24 +1,28 @@
 <template>
   <div>
     <ul>
-      <li v-for="item in filteredArtical" :key="item.id">
-        <div class="item-content">
-          <a class="title">{{item.title}}</a>
-          <p>{{item.body}}</p>
-          <h1>{{searchString}}</h1>
-        </div>
-      </li>
+      <li>ee</li>
     </ul>
   </div>
 </template>
 
 <script>
+import { request } from '../network/request'
 export default {
   name: 'Tag',
   data() {
     return {}
   },
-  methods: {}
+  methods: {},
+  created() {
+    request({
+      url: '/api/tag'
+    })
+      .then(res => console.log(res))
+      .catch(err => {
+        console.log(err)
+      })
+  }
 }
 </script>
 
