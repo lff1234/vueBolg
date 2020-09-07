@@ -67,6 +67,7 @@
       <keep-alive>
         <router-view v-if="this.$route.meta.keepAlive"></router-view>
       </keep-alive>
+      <!-- <router-view v-if="isRouterAlive"></router-view> -->
       <router-view v-if="!this.$route.meta.keepAlive"></router-view>
     </el-main>
     <el-footer></el-footer>
@@ -75,12 +76,18 @@
 
 <script>
 export default {
+  provide() {
+    return {
+      reload: this.reload
+    }
+  },
   name: 'app',
   components: {},
   data() {
     return {
       content: '',
       userImg: this.$store.state.avator
+      // isRouterAlive:!this.$route.meta.keepAlive
       // isLogin: this.$store.getters.isLoggedIn
     }
   },
@@ -91,11 +98,20 @@ export default {
       // console.log(this.$route.matched[0].props.default)
       this.$route.matched[0].props.default.searchString = newValue
       // console.log(this.$route.matched[0].props.default)
+    },
+    userImg: function(newValue, oldValue) {
+      this.userImg = newValue
     }
   },
   methods: {
+    reload() {
+      this.$route.meta.keepAlive = true
+      this.$nextTick(function() {
+        this.$route.meta.keepAlive = false
+      })
+    },
     isLogin() {
-      // console.log(this.$store.getters.isLoggedIn)
+      // console.log(this.$store.state.avator)
       return this.$store.getters.isLoggedIn
     },
     login() {

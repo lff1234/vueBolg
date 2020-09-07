@@ -33,7 +33,7 @@
           <i class="iconfont">
             <img
               class="like-icon"
-              v-show="!item.isLike"
+              v-show="!show(i)"
               id="is-like-imgactive"
               src="https://blog.csdn.net/static_files/template/new_img/commentUnHeart.png"
               width="15px"
@@ -42,7 +42,7 @@
             />
             <img
               class="like-icon"
-              v-show="item.isLike"
+              v-show="show(i)"
               id="is-like-img"
               src="https://blog.csdn.net/static_files/template/new_img/commentActiveHeart.png"
               width="15px"
@@ -73,11 +73,11 @@
                 <i class="iconfont el-icon-chat-dot-round"></i>
                 回复
               </span>
-              <span @click.stop="likeClick(reply,i,j)">
+              <span @click.stop="likeClicks(reply,i,j)">
                 <i class="iconfont">
                   <img
                     class="like-icon"
-                    v-show="reply.isLike"
+                    v-show="shows(i,j)"
                     id="is-like-imgactive"
                     src="https://csdnimg.cn/release/phoenix/template/new_img/tobarThumbUpactive.png"
                     width="20px"
@@ -86,7 +86,7 @@
                   />
                   <img
                     class="like-icon"
-                    v-show="!reply.isLike"
+                    v-show="!shows(i,j)"
                     id="is-like-img"
                     src="https://csdnimg.cn/release/phoenix/template/new_img/tobarThumbUp.png"
                     width="20px"
@@ -167,8 +167,16 @@ const clickoutside = {
 }
 
 export default {
+  inject: ['reload'],
   name: 'comment',
-  props: ['articleComment', 'articleId'],
+  props: {
+    articleComment: {
+      type: Array
+    },
+    articleId: {
+      type: String
+    }
+  },
   // mounted() {
   //   console.log(JSON.stringify(this.comments))
   // },
@@ -178,22 +186,22 @@ export default {
       btnShow: false,
       index: '0',
       replyComment: '',
-      myName: '',
+
       myHeader: sessionStorage.getItem('avator'),
-      myId: 1,
+      myId: this.$store.state.logId || sessionStorage.getItem('logid'),
       to: '',
       toId: -1,
-      comments: this.articleComment,
+      comments: this.$store.state.commentList,
       pullDown: true
       // focusState: false
     }
   },
-  // created() {
-  //   if (sessionStorage.getItem('commentList')) {
-  //     this.comments = sessionStorage.getItem('commentList')
-  //     console.log('ok')
-  //   }
-  // },
+  watch: {
+    myId: function(newVal, oldVal) {
+      this.myId = newVal
+    }
+  },
+
   directives: {
     clickoutside,
     focus: {
@@ -206,21 +214,35 @@ export default {
       }
     }
   },
-  created() {
-    if (sessionStorage.getItem(this.$route.params.id)) {
-      this.comments = JSON.parse(sessionStorage.getItem(this.$route.params.id))
-      this.$store.state.commentList = this.comments
-      // console.log('ok')
-    }
-  },
+  // watch: {
+  //   articleComment: {
+  //     handler(val, oldVal) {
+  //       // console.log(val)
+  //       this.comments = val
+  //       // this.comments = Object.assign([], this.comments, val)
+  //       // this.$set(this.comments, 0, val)
+  //       // this.$forceUpdate()
+  //       // console.log(this.comments)
+  //     },
+  //     deep: true,
+  //     immediate: true
+  //   }
+  // },
+  // created() {
+  //   if (sessionStorage.getItem(this.$route.params.id)) {
+  //     // this.comments = JSON.parse(sessionStorage.getItem(this.$route.params.id))
+  //     this.$store.state.commentList = this.articleComment
+  //     // console.log(this.$store.state.commentList)
+  //   }
+  // },
   mounted() {
-    window.onbeforeunload = () => {
-      // sessionStorage.removeItem('commentList')
-      sessionStorage.setItem(
-        this.$route.params.id,
-        JSON.stringify(this.$store.state.commentList)
-      )
-    }
+    // window.onbeforeunload = () => {
+    //   // sessionStorage.removeItem('commentList')
+    //   sessionStorage.setItem(
+    //     this.$route.params.id,
+    //     JSON.stringify(this.$store.state.commentList)
+    //   )
+    // }
 
     document.onclick = e => {
       // console.log(e.target.className.indexOf('reply-input'))
@@ -233,52 +255,155 @@ export default {
       }
     }
   },
+
+  // computed: {
+  //   comments: {
+  //     get() {
+  //       return this.articleComment
+  //     }
+  //     // set(val) {
+  //     //   this.articleComment = val
+  //     // }
+  //   }
+  // },
   destroyed() {
     document.onclick = null
   },
   methods: {
+    show(i) {
+      // console.log(this.comments)
+      // console.log(JSON.stringify(this.comments))
+      let m = this.comments[i].users.indexOf(this.myId)
+
+      return m >= 0
+    },
+    shows(i, j) {
+      // console.log(this.comments[2].reply)
+      // JSON.parse(JSON.stringify(this.comments[i].reply[j].users))
+      let m = this.comments[i].reply[j].users.indexOf(this.myId)
+      // console.log(i, j, m)
+      return m >= 0
+    },
     setPullDown(data) {
       this.pullDown = data
     },
     likeClick(item, i) {
-      if (item.isLike === null) {
-        this.$set(item, 'isLike', true)
-        item.like++
+      // console.log(this.$store.state.logId)
+      // let userid = this.$store.state.logId
+      let usernames = item.users
+      // console.log(usernames)
+      if (usernames.indexOf(this.myId) < 0) {
+        request({
+          method: 'post',
+          url: '/api/dianzan',
+          data: {
+            userid: this.myId,
+            id: item._id
+          }
+        })
+          .then(res => {
+            console.log(res)
+            this.$set(this.comments[i], 'users', res.data.users)
+            this.$set(this.comments[i], 'like', res.data.like)
+            // location.reload()
+          })
+          .catch(err => {
+            console.log(err)
+          })
       } else {
-        if (item.isLike) {
-          item.like--
-        } else {
-          item.like++
-        }
-
-        item.isLike = !item.isLike
+        request({
+          method: 'post',
+          url: '/api/canclezan',
+          data: {
+            userid: this.myId,
+            id: item._id
+          }
+        })
+          .then(res => {
+            console.log(res)
+            this.$set(this.comments[i], 'users', res.data.users)
+            this.$set(this.comments[i], 'like', res.data.like)
+            // location.reload()
+          })
+          .catch(err => {
+            console.log(err)
+          })
       }
-      this.$store.state.commentList[i] = item
+      // if (item.isLike === null) {
+      //   this.$set(item, 'isLike', true)
+      //   item.like++
+      // } else {
+      //   if (item.isLike) {
+      //     item.like--
+      //   } else {
+      //     item.like++
+      //   }
+
+      //   item.isLike = !item.isLike
+      // }
+      // this.$store.state.commentList[i] = item
       // console.log()
     },
-    likeClick(item, i, j) {
-      if (item.isLike === null) {
-        this.$set(item, 'isLike', true)
-        item.like++
+    likeClicks(item, i, j) {
+      // let userid = this.$store.state.logId
+      // console.log(this.comments[i].reply[j].users)
+      // console.log(this.myId)
+      let usernames = item.users
+      // console.log(usernames)
+      if (usernames.indexOf(this.myId) < 0) {
+        request({
+          method: 'post',
+          url: '/api/dianzan',
+          data: {
+            userid: this.myId,
+            id: item._id
+          }
+        })
+          .then(res => {
+            console.log(res)
+            this.$set(this.comments[i].reply[j], 'users', res.data.users)
+            this.$set(this.comments[i].reply[j], 'like', res.data.like)
+            // console.log(this.comments[i].reply[j].users)
+            // location.reload()
+          })
+          .catch(err => {
+            console.log(err)
+          })
       } else {
-        if (item.isLike) {
-          item.like--
-        } else {
-          item.like++
-        }
-
-        item.isLike = !item.isLike
+        request({
+          method: 'post',
+          url: '/api/canclezan',
+          data: {
+            userid: this.myId,
+            id: item._id
+          }
+        })
+          .then(res => {
+            console.log(res)
+            this.$set(this.comments[i].reply[j], 'users', res.data.users)
+            this.$set(this.comments[i].reply[j], 'like', res.data.like)
+            // location.reload()
+          })
+          .catch(err => {
+            console.log(err)
+          })
       }
-      this.$store.state.commentList[i].reply[j] = item
-      // console.log(this.$store.state.commentList)
+      // if (item.isLike === null) {
+      //   this.$set(item, 'isLike', true)
+      //   item.like++
+      // } else {
+      //   if (item.isLike) {
+      //     item.like--
+      //   } else {
+      //     item.like++
+      //   }
 
-      // sessionStorage.setItem(
-      //   'commentList',
-      //   JSON.stringify(this.$store.state.commentList)
-      // )
+      //   item.isLike = !item.isLike
+      // }
+      // this.$store.state.commentList[i].reply[j] = item
     },
     inputFocus() {
-      if (!this.$store.state.logId) {
+      if (!this.myId) {
         this.$message({
           showClose: true,
           type: 'warning',
@@ -302,7 +427,7 @@ export default {
     },
     showReplyInput(i, name, id) {
       // console.log(window.sessionStorage.getItem('logid'))
-      if (!this.$store.state.logId) {
+      if (!this.myId) {
         this.$message({
           showClose: true,
           type: 'warning',
@@ -310,9 +435,11 @@ export default {
         })
         // this.$router.push('/login')
       } else {
-        this.comments[this.index].inputShow = false
+        this.$set(this.comments[this.index], 'inputShow', false)
+        // this.comments[this.index].inputShow = false
         this.index = i
-        this.comments[i].inputShow = true
+        this.$set(this.comments[i], 'inputShow', true)
+        // this.comments[i].inputShow = true
         this.to = name
         this.toId = id
         this.replyed = '回复：' + name

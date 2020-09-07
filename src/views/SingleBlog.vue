@@ -31,6 +31,7 @@ export default {
         // console.log(res)
         this.blog = res.data.blogContent
         this.comment = res.data.comment
+        // console.log(this.comment)
         this.$store.commit('UpdateCommentList', res.data.comment)
         // this.$store.state.commentList = res.data.comment
         // console.log(this.comment)

@@ -41,6 +41,7 @@ app.use(
     }).unless({
         path: [
                 { url: /^\/api\/home(\/\d{1,})?/, methods: ['GET'] },
+                { url: '/api/dianzan', methods: ['GET'] },
                 '/api/logout',
                 '/api/login',
                 '/api/tag'

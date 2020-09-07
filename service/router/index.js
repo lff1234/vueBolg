@@ -13,6 +13,8 @@ router.get('/home', function(req, res, next) {
         return res.json(data);
     });
 });
+router.post('/dianzan', services.dianZan);
+router.post('/canclezan', services.cancleZan);
 router.get('/home/:id', services.contentGet);
 router.post('/home/:id', services.comment);
 router.get('/logout', function(req, res, next) {

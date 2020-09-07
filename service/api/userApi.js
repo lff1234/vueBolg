@@ -79,7 +79,73 @@ exports.contentGet = async(req, res) => {
             });
         });
 };
+exports.dianZan = async(req, res) => {
+    let { userid, id } = req.body;
+    // console.log(userid, id);
+    let comment = await Comment.findById({ _id: id });
+    if (comment && userid) {
+        if (comment.users.indexOf(userid) < 0) {
+            let num = comment.like;
+            num++;
+            // console.log(num);
+            let newComment = await Comment.findOneAndUpdate({ _id: id }, { $push: { users: userid }, $set: { like: num } }, {
+                new: true
+            });
+            if (!newComment) {
+                console.log('点赞失败');
+                return;
+            }
+            // console.log(newComment);
+            return res.json({
+                err: 0,
+                msg: '点赞成功',
+                data: {
+                    users: newComment.users,
+                    like: newComment.like
+                }
+            });
+        }
+    } else {
+        return res.json({
+            err: '-1',
+            msg: '系统错误'
+        });
+    }
+};
+exports.cancleZan = async(req, res) => {
+    let { userid, id } = req.body;
 
+    let comment = await Comment.findById({ _id: id });
+    if (comment) {
+        // console.log(comment.users);
+        if (comment.users.indexOf(userid) !== -1) {
+            let num = comment.like;
+            num--;
+            let newComment = await Comment.findOneAndUpdate({ _id: id }, { $pull: { users: userid }, $set: { like: num } }, {
+                new: true
+            });
+            if (!newComment) {
+                console.log('取消点赞失败');
+                return;
+            }
+
+            return res.json({
+                err: 0,
+                msg: '取消点赞成功',
+                data: {
+                    users: newComment.users,
+                    like: newComment.like
+                }
+            });
+        }
+    } else {
+        return res.json({
+            err: '-1',
+            msg: '系统错误',
+            data: newComment
+        });
+    }
+};
 exports.comment = async(req, res) => {
     let comment = await Comment.create({
         articleid: req.body.articleid,

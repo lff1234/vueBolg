@@ -8,7 +8,7 @@ exports.setToken = function(user) {
                 _id: user._id
             },
             signkey, {
-                expiresIn: '0.1h'
+                expiresIn: '1h'
             }
         );
         resolve(token);
