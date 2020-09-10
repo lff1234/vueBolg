@@ -15,7 +15,8 @@ import {
     FormItem,
     Avatar,
     Button,
-    Message
+    Message,
+    Pagination
 } from 'element-ui';
 
 Vue.use(Container);
@@ -30,6 +31,7 @@ Vue.use(Form);
 Vue.use(FormItem);
 Vue.use(Avatar);
 Vue.use(Message);
+Vue.use(Pagination);
 Vue.prototype.$store = store;
 Vue.prototype.$message = Message;
 Vue.config.productionTip = false;

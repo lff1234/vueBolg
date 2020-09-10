@@ -11,7 +11,9 @@ import { request } from '../network/request'
 export default {
   name: 'Tag',
   data() {
-    return {}
+    return {
+      shiyan: ''
+    }
   },
   methods: {},
   created() {

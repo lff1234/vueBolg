@@ -1,6 +1,6 @@
 <template>
   <div id="comment">
-    <div v-clickoutside="hideReplyBtn" @click.stop.stop="inputFocus()" class="my-reply">
+    <div @click.stop="inputFocus()" class="my-reply">
       <el-avatar class="header-img" :size="40" :src="myHeader"></el-avatar>
       <div class="reply-info">
         <div
@@ -12,6 +12,7 @@
           class="reply-input"
           @focus="showReplyBtn"
           @input="onDivInput($event)"
+          v-clickoutside="hideReplyBtn"
         ></div>
       </div>
       <div class="reply-btn-box" v-show="btnShow">
@@ -25,7 +26,7 @@
         <span class="author-time">{{ dateStr(item.time) }}</span>
       </div>
       <div class="icon-btn">
-        <span @click.stop="showReplyInput(i, item.fromName, item.fromId)">
+        <span @click.stop="showReplyInput(item,i)">
           <i class="iconfont el-icon-chat-dot-round"></i>
           回复({{ item.commentNum }})
         </span>
@@ -57,7 +58,7 @@
       </div>
       <div class="talk-box">
         <p>
-          <span class="reply">{{ item.content }}</span>
+          <span class="reply" v-html="item.content"></span>
         </p>
       </div>
       <div class="reply-box">
@@ -69,7 +70,7 @@
               <span class="author-time">{{ dateStr(reply.time) }}</span>
             </div>
             <div class="icon-btn">
-              <span @click.stop="showReplyInput(i, reply.fromName, reply.fromId)">
+              <span @click.stop="showReplyInput(reply,i)">
                 <i class="iconfont el-icon-chat-dot-round"></i>
                 回复
               </span>
@@ -77,20 +78,20 @@
                 <i class="iconfont">
                   <img
                     class="like-icon"
-                    v-show="shows(i,j)"
+                    v-show="!shows(i,j)"
                     id="is-like-imgactive"
-                    src="https://csdnimg.cn/release/phoenix/template/new_img/tobarThumbUpactive.png"
-                    width="20px"
-                    height="20px"
+                    src="https://blog.csdn.net/static_files/template/new_img/commentUnHeart.png"
+                    width="15px"
+                    height="15px"
                     alt
                   />
                   <img
                     class="like-icon"
-                    v-show="!shows(i,j)"
+                    v-show="shows(i,j)"
                     id="is-like-img"
-                    src="https://csdnimg.cn/release/phoenix/template/new_img/tobarThumbUp.png"
-                    width="20px"
-                    height="20px"
+                    src="https://blog.csdn.net/static_files/template/new_img/commentUnHeart.png"
+                    width="15px"
+                    height="15px"
                     alt
                   />
                 </i>
@@ -100,7 +101,7 @@
             <div class="talk-box">
               <p>
                 <span>回复 {{ reply.toName }}:</span>
-                <span class="reply">{{ reply.content }}</span>
+                <span class="reply" v-html="reply.content"></span>
               </p>
             </div>
           </div>
@@ -121,6 +122,7 @@
             @input="onDivInput($event)"
             class="reply-input reply-comment-input"
             v-focus="comments[i].inputShow"
+            v-clickoutside="hideReply"
           ></div>
         </div>
         <div class="reply-btn-box">
@@ -145,13 +147,22 @@ const clickoutside = {
   bind(el, binding, vnode) {
     function documentHandler(e) {
       // 这里判断点击的元素是否是本身，是本身，则返回
-      if (el.contains(e.target)) {
+
+      if (
+        el.contains(e.target) ||
+        e.target.className.indexOf('reply-input') != -1
+      ) {
         return false
       }
+
       // 判断指令中是否绑定了函数
+
       if (binding.expression) {
+        // console.log(el, e.target)
         // 如果绑定了函数 则调用那个函数，此处binding.value就是handleClose方法
-        binding.value(e)
+        binding.value()
+        // console.log(el.innerHTML)
+        el.innerHTML = ''
       }
     }
     // 给当前元素绑定个私有变量，方便在unbind中可以解除事件监听
@@ -209,7 +220,7 @@ export default {
         // console.log(el)
         if (binding.value) {
           el.focus()
-          el.scrollIntoView()
+          // el.scrollIntoView()
         }
       }
     }
@@ -243,17 +254,22 @@ export default {
     //     JSON.stringify(this.$store.state.commentList)
     //   )
     // }
-
-    document.onclick = e => {
-      // console.log(e.target.className.indexOf('reply-input'))
-      if (e.target.className.indexOf('reply-input') == -1) {
-        for (let item of this.comments) {
-          // console.log(this.comments.inputShow)
-          // console.log(item)
-          item.inputShow = false
-        }
-      }
+    for (let item of this.comments) {
+      // console.log(this.comments.inputShow)
+      // console.log(item)
+      this.$set(item, 'inputShow', false)
     }
+    // document.onclick = e => {
+    //   // console.log(e.target.className.indexOf('reply-input'))
+    //   // document.getElementById()
+    //   if (e.target.className.indexOf('reply-input') == -1) {
+    //     for (let item of this.comments) {
+    //       // console.log(this.comments.inputShow)
+    //       // console.log(item)
+    //       item.inputShow = false
+    //     }
+    //   }
+    // }
   },
 
   // computed: {
@@ -270,6 +286,13 @@ export default {
     document.onclick = null
   },
   methods: {
+    hideReply() {
+      for (let item of this.comments) {
+        // console.log(this.comments.inputShow)
+        // console.log(item)
+        item.inputShow = false
+      }
+    },
     show(i) {
       // console.log(this.comments)
       // console.log(JSON.stringify(this.comments))
@@ -421,11 +444,12 @@ export default {
       this.btnShow = true
     },
     hideReplyBtn() {
+      // console.log(e)
       this.btnShow = false
       replyInput.style.padding = '10px'
       replyInput.style.border = 'none'
     },
-    showReplyInput(i, name, id) {
+    showReplyInput(item, i) {
       // console.log(window.sessionStorage.getItem('logid'))
       if (!this.myId) {
         this.$message({
@@ -435,14 +459,20 @@ export default {
         })
         // this.$router.push('/login')
       } else {
-        this.$set(this.comments[this.index], 'inputShow', false)
-        // this.comments[this.index].inputShow = false
+        this.comments[this.index].inputShow = false
         this.index = i
-        this.$set(this.comments[i], 'inputShow', true)
-        // this.comments[i].inputShow = true
-        this.to = name
-        this.toId = id
-        this.replyed = '回复：' + name
+        // this.$set(this.comments[i], 'inputShow', true)
+        this.comments[i].inputShow = true
+        this.to = item.fromName
+        this.toId = item.fromId
+
+        this.replyed = '回复：' + item.fromName
+        let m = document.getElementsByClassName('reply-comment-input')[0]
+        if (m.innerHTML) {
+          m.innerHTML = ''
+          // m.setAttribute('placeholder', '')
+        }
+        // console.log(this.comments[i])
       }
     },
     _inputShow(i) {
@@ -460,7 +490,7 @@ export default {
         let input = document.getElementById('replyInput')
         let timeNow = new Date().getTime()
         // let time = this.dateStr(timeNow)
-        a.fromId = this.$store.state.logId
+        a.fromId = this.myId
         // a.from = this.myName
         // a.toId = ''
         // a.parentId = ''
@@ -506,7 +536,7 @@ export default {
         let a = {}
         let timeNow = new Date().getTime()
         // let time = this.dateStr(timeNow)
-        a.fromId = this.$store.state.logId
+        a.fromId = this.myId
         a.toId = this.comments[i].fromId
         a.articleid = this.articleId
         a.content = this.replyComment
@@ -541,7 +571,15 @@ export default {
       }
     },
     onDivInput: function(e) {
+      this.replyed = ''
+      // let m = document.defaultView.getComputedStyle(e.target, ':before')
+      // console.log(e.target.innerHTML)
+      // if (e.target.innerHTML) {
+      //   e.target.setAttribute('placeholder', '')
+      // }
+
       this.replyComment = e.target.innerHTML
+      // console.log(m.content)
       // e.cancelBubble = true
     },
     dateStr(date) {
@@ -612,6 +650,9 @@ export default {
         border: 2px solid blue
         box-shadow: none
         outline: none
+    .reply-comment-input
+      &:focus:before
+        content: attr(placeholder)
   .reply-btn-box
     height: 25px
     margin: 10px 0

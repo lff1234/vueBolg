@@ -57,7 +57,7 @@
           <button class="Button" @click="register()">注册</button>
         </div>
         <div class="userHome" v-if="isLogin()">
-          <el-avatar :size="40" :src="userImg"></el-avatar>
+          <el-avatar :size="40" :src="userImg" :title="username"></el-avatar>
           <span class="logOut" @click="logOut()">[退出]</span>
         </div>
       </div>
@@ -86,7 +86,8 @@ export default {
   data() {
     return {
       content: '',
-      userImg: this.$store.state.avator
+      userImg: this.$store.state.avator || sessionStorage.getItem('avator'),
+      username: sessionStorage.getItem('username') || ''
       // isRouterAlive:!this.$route.meta.keepAlive
       // isLogin: this.$store.getters.isLoggedIn
     }
@@ -150,19 +151,7 @@ body {
   font-size: 16px;
   background: #f5f6f7;
 }
-@media screen and (max-width: 980px) {
-  .list {
-    display: none;
-  }
-}
-@media (max-width: 719px) {
-  .sidebar-button {
-    display: block;
-  }
-  .search-box_ins {
-    display: none;
-  }
-}
+
 .sidebar-button {
   cursor: pointer;
   display: none;
@@ -179,7 +168,10 @@ body {
 
 .el-header {
   /* min-width: 1032px; */
+  padding: 0.7rem 1.5rem;
+  line-height: 2.2rem;
   position: fixed;
+  height: 3.6rem;
   z-index: 1;
   left: 0;
   right: 0;
@@ -299,5 +291,18 @@ li a:hover {
 .logOut:hover {
   cursor: pointer;
   color: red;
+}
+@media screen and (max-width: 980px) {
+  .list {
+    display: none;
+  }
+}
+@media screen and (max-width: 719px) {
+  .sidebar-button {
+    display: block;
+  }
+  .search-box_ins {
+    display: none;
+  }
 }
 </style>
