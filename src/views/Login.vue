@@ -3,38 +3,36 @@
     <div class="mengceng">
       <!--flex弹性盒子模型，justify-content：主抽 -->
       <div class="usrlog">
-        <el-card>
-          <span class="text">欢迎登陆</span>
-          <table>
-            <tr>
-              <td>用户名</td>
-              <td>
-                <el-input v-model="user.username" placeholder="请输入用户名"></el-input>
-              </td>
-            </tr>
-            <tr>
-              <td>密码</td>
-              <td>
-                <el-input
-                  type="password"
-                  v-model="user.password"
-                  placeholder="请输入密码"
-                  @keydown.enter.native="doLogin"
-                ></el-input>
-                <!-- @keydown.enter.native="doLogin"当按下enter键的时候也会执行doLogin方法-->
-              </td>
-            </tr>
-            <tr>
-              <!-- 占两行-->
-              <td colspan="2">
-                <!-- 点击事件的两种不同的写法v-on:click和 @click-->
-                <!--<el-button style="width: 300px" type="primary" v-on:click="doLogin">登录</el-button>-->
-                <el-button style="width: 300px" type="primary" @click="doLogin">登录</el-button>
-              </td>
-            </tr>
-          </table>
+        <el-card class="userLogin">
+          <!-- <p class="text">欢迎登陆</p> -->
+          <el-form
+            :model="user"
+            :rules="rules"
+            ref="ruleForm"
+            label-width="100px"
+            class="demo-ruleForm"
+          >
+            <el-form-item label="用户名" prop="username">
+              <el-input v-model="user.username" placeholder="请输入用户名"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" prop="password">
+              <el-input
+                v-model="user.password"
+                placeholder="请输入密码"
+                show-password
+                @keydown.enter.native="submitForm('ruleForm')"
+              ></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button
+                type="primary"
+                @click.stop="submitForm('ruleForm')"
+                class="login-buttton"
+              >登陆</el-button>
+            </el-form-item>
+          </el-form>
         </el-card>
-        <button class="closeButton" @click="cancelLogin()">
+        <button class="closeButton" @click.stop="cancelLogin()">
           <svg
             class="Zi Zi--Close Modal-closeIcon"
             fill="currentColor"
@@ -57,29 +55,89 @@
 export default {
   name: 'login',
   data() {
+    let validateUser = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('请输入密码'))
+      } else if (value && this.err == -2) {
+        // console.log(this.err);
+        callback(new Error('密码错误'))
+      } else {
+        callback()
+      }
+    }
+    let validateUser1 = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('请输入用户名'))
+      } else if (value && this.err == -1) {
+        // console.log(this.err);
+        callback(new Error('用户名不存在'))
+      } else {
+        callback()
+      }
+    }
+
     return {
       user: {
         username: '',
         password: ''
       },
-      test: ''
+      err: '',
+      rules: {
+        username: {
+          required: true,
+          validator: validateUser1,
+          trigger: 'blur'
+        },
+        password: {
+          required: true,
+          validator: validateUser,
+          trigger: 'blur'
+        }
+      }
     }
   },
   methods: {
-    doLogin() {
+    doLogin(formName) {
       this.$store
         .dispatch('Login', this.user)
         .then(res => {
-          this.$router.go(-1)
+          if (res.err == 0) {
+            this.$emit('cancle')
+            // this.$router.go(-1)
+          } else {
+            this.err = res.err
+            this.$refs[formName].validate(valid => {
+              if (!valid) {
+                return false
+              }
+            })
+            // console.log(this.err);
+          }
+
           // this.$router.push({ path: '/home' })
         })
         .catch(err => {
+          // if(err.ms)
           console.log(err)
         })
     },
+    submitForm(formName) {
+      this.err = ''
+      this.$refs[formName].validate(valid => {
+        // this.doLogin();
+        if (valid) {
+          this.doLogin(formName)
+          // console.log('提交');
+        } else {
+          // console.log('error submit!!');
+          return false
+        }
+      })
+    },
 
     cancelLogin() {
-      this.$router.go(-1)
+      this.$emit('cancle')
+      // this.$router.go(-1)
       // this.$router.push({
       //   path: '/home'
       // })
@@ -95,10 +153,8 @@ export default {
   left: 0;
   bottom: 0;
   right: 0;
-  z-index: 203;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
+  z-index: 9999;
+
   background-color: rgba(26, 26, 26, 0.65);
 }
 
@@ -114,18 +170,22 @@ export default {
   margin-top: -114px;
   z-index: 1;
 }
-
+.el-card {
+  padding: 0 40px 0 0;
+}
+.login-buttton {
+  width: 100%;
+}
 .text {
   height: 20px;
-  text-align: center;
+  /* text-align: justify; */
   font-weight: 700;
   font-size: 20px;
 }
 
-table {
-  border-spacing: 0px 10px;
+.el-form {
+  margin-top: 10px;
 }
-
 .closeButton {
   position: absolute;
   top: -9px;

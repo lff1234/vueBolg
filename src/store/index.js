@@ -1,17 +1,20 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
+// import Vue from 'vue';
+// import Vuex from 'vuex';
 import mutations from './mutations';
 import actions from './actions';
 import getters from './getters';
-Vue.use(Vuex);
+// Vue.use(Vuex);
 
 const state = {
-    currentUser: null,
-    status: '',
+    content: '',
+    currentUser: sessionStorage.getItem('username') || '',
+    status: false,
     logId: sessionStorage.getItem('logid') || '',
     token: sessionStorage.getItem('token') || '',
     commentList: sessionStorage.getItem('commentList') || [],
-    avator: sessionStorage.getItem('avator') || ''
+    avator: '/api/' + sessionStorage.getItem('avator') || '',
+    timer: null,
+    usrCard: {}
 };
 export default new Vuex.Store({
     state,

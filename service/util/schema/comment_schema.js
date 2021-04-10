@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Article = require('./article_schema');
+const User = require('./user_schema');
 const commentSchema = new mongoose.Schema({
     articleid: {
         type: mongoose.Schema.Types.ObjectId,
@@ -23,10 +24,6 @@ const commentSchema = new mongoose.Schema({
     },
     commentNum: {
         type: Number
-    },
-    fromHeadImg: {
-        type: String,
-        default: 'https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg'
     },
     parentId: {
         // type: String

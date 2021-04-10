@@ -8,12 +8,18 @@ const db = mongoose();
 const vertoken = require('./util/token_vertify');
 const expressJwt = require('express-jwt');
 const router = require('./router/index.js');
+
 // 注册解析 表单数据的 body-parser
 const bodyParser = require('body-parser');
+// post
+app.use(bodyParser.urlencoded({ extended: false }));
+// 处理json格式的参数
+app.use(bodyParser.json());
+
 // // const services = require('./api/userApi.js');
 // // 将请求响应设置content-type设置为application/json
 
-// 解析token获取用户信息
+//解析token获取用户信息
 // app.use(function(req, res, next) {
 //     let token = req.headers['authorization'];
 //     // console.log(token);
@@ -24,7 +30,7 @@ const bodyParser = require('body-parser');
 //             .verToken(token)
 //             .then(data => {
 //                 // req.data = data;
-//                 // console.log(data);
+//                 console.log(data);
 //                 return next();
 //             })
 //             .catch(error => {
@@ -42,9 +48,16 @@ app.use(
         path: [
                 { url: /^\/api\/home(\/\d{1,})?/, methods: ['GET'] },
                 { url: '/api/dianzan', methods: ['GET'] },
+                {
+                    url: /^\/api\/public\/myUpload(\/.+){0,}?/,
+                    methods: ['GET']
+                },
+
                 '/api/logout',
                 '/api/login',
-                '/api/tag'
+                '/api/register',
+                '/api/tag',
+                '/api/refreshToken'
             ] //除了这个地址，其他的URL都需要验证
     })
 );
@@ -79,17 +92,17 @@ app.use('/api/*', function(req, res, next) {
     // next()方法表示进入下一个路由
     next();
 });
-// post
-app.use(bodyParser.urlencoded({ extended: false }));
-// 处理json格式的参数
-app.use(bodyParser.json());
+
 // 配置路由
 app.use('/api', router);
 app.get('/', (req, res) => {
     res.send('123');
 });
+
+app.use('/api/public', express.static(path.join(__dirname, 'public')));
 // app.post('/login', services.login);
 // 服务器已经启动
 app.listen('8700', function() {
     console.log('running...');
+    console.log(__dirname);
 });

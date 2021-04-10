@@ -20,6 +20,10 @@ let userSchema = new Schema({
     avator: {
         type: String,
         default: 'https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg'
+    },
+    signature: {
+        type: String,
+        default: '此人还未写自己的人生格言哦'
     }
 }, { collection: 'user' });
 module.exports = mongoose.model('User', userSchema);

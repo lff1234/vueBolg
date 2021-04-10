@@ -1,16 +1,59 @@
 <template>
   <div class="home">
+    <div class="sticky-bar">
+      <div class="container sticky-body">
+        <div class="tag-list">
+          <el-button
+            @click="switchTag('')"
+            size="small"
+            :type="!$route.query.tag ? 'primary' : 'default'"
+            >全部</el-button
+          >
+          <el-button
+            v-for="(tag, index) in tagList"
+            :key="index"
+            :type="$route.query.tag === tag ? 'primary' : 'default'"
+            size="small"
+            @click="switchTag(tag)"
+            >{{ tag }}</el-button
+          >
+        </div>
+      </div>
+    </div>
     <ul>
       <li v-for="item in filterArtical" :key="item.id">
         <div class="item-content">
-          <router-link class="title" :to="{ path: `/home/${item.id}` }">{{ item.title }}</router-link>
-          <div class="oneline">{{ item.body }}</div>
+          <router-link class="title" :to="{ path: `/home/${item.id}` }">
+            <span
+              v-html="brightenKeyword(item.title)"
+              @click="view(item)"
+            ></span>
+          </router-link>
+          <article class="oneline">{{ item.intro || item.contentMd }}</article>
           <div class="item-action">
-            <span>发布时间：2020-08-08</span>
-            <div class="interval"></div>
-            <span>标签：vue.js</span>
-            <div class="interval"></div>
-            <span>作者：vue.js</span>
+            <div>
+              <span>发布时间：{{ item.editUpdate | newDate }}</span>
+              <!-- <div class="interval"></div> -->
+              <span>
+                标签：
+                <el-tag
+                  v-for="tag in item.tags"
+                  :key="tag"
+                  :type="$route.query.tag === tag ? 'info' : 'warning'"
+                  size="mini"
+                  :effect="$route.query.tag === tag ? 'dark' : 'plain'"
+                  >{{ tag }}</el-tag
+                >
+              </span>
+              <!-- <div class="interval"></div> -->
+              <span>作者：{{ item.username }}</span>
+            </div>
+            <span
+              class="edit-color"
+              @click="editMd(item)"
+              v-show="userId && item.userid == userId"
+              >编辑</span
+            >
           </div>
         </div>
       </li>
@@ -20,60 +63,208 @@
 
 <script>
 // @ is an alias to /src
-import { request } from '../network/request'
-import Tag from './Tag'
-
+// import { mapState } from 'vuex';
+import { request } from '../utils/network/request';
+import buildToc from '../utils/build_toc';
 export default {
   name: 'Home',
   components: {},
   props: {
     searchString: {
       type: String
+    },
+    newArticle: {
+      type: Object
     }
   },
   data() {
     return {
-      list: []
-    }
+      list: [],
+      search: [],
+      tagList: ['vue.js', 'mongoose', 'java', 'c++', 'go'],
+      taglist: ''
+    };
   },
   created() {
-    // console.log('创建成功')
     request({
       url: '/api/home'
     })
       .then(data => {
+        // this.list = data
         // console.log(data)
         for (let val of data) {
-          this.list.push(val)
+          this.list.push(val);
         }
       })
       .catch(err => {
-        console.log(err)
-      })
+        console.log(err);
+      });
   },
+  filters: {
+    newDate: function(val) {
+      // console.log(typeof val)
+      let d = new Date(parseInt(Date.parse(val)));
+      d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+      return d
+        .toISOString()
+        .replace(/T/g, ' ')
+        .replace(/\.[\d]{3}Z/, '');
+    }
+  },
+  methods: {
+    editMd(item) {
+      console.log(item);
+      this.$router.push('/markdown');
+      this.$route.matched[0].props.default.article = item;
+    },
+    brightenKeyword(val) {
+      let searchStrings = this.searchString.trim();
+      let transformString = searchStrings.replace(
+        /[.[*?+^$|()/]|\]|\\/g,
+        '\\$&'
+      );
+      let replaceReg = new RegExp(transformString, 'g');
+      let replaceString =
+        '<span class="heightLight">' + searchStrings + '</span>';
+      if (val) {
+        return val.replace(replaceReg, replaceString);
+      }
+    },
+    view(item) {
+      let tocData = buildToc(item.contentMd);
+      this.$set(item, 'toc', tocData.toc);
+      item.contentMd = tocData.article;
+      this.$store.commit('setContent', item);
+      // console.log(item)
+    },
+    switchTag(tag) {
+      let query = {};
+      // if (this.$route.query.type === 'list') {
+      //   query.type = 'list'
+      //   query.page = 1
+      // }
+      if (tag) {
+        query.tag = tag;
+      }
+      this.$router.replace({
+        path: '/home',
+        query
+      });
+      // console.log(this.$route.query.tag)
 
-  computed: {
-    filterArtical: function() {
-      let searchStrings = this.searchString.trim()
-      // console.log(this.list)
-
-      let articles_array = this.list
-      // console.log(this.searchString);
-      if (!searchStrings) {
-        // this.$nextTick()
-        return this.list
-      } else {
-        articles_array = articles_array.filter(function(item) {
-          return item.title.indexOf(searchStrings) !== -1
-          // return true
+      request({
+        url: `/api/home?tag=${this.$route.query.tag}`
+      })
+        .then(res => {
+          this.taglist = res;
         })
-        return articles_array
+        .catch(err => {
+          console.log(err);
+        });
+    }
+  },
+  computed: {
+    // ...mapState({
+    ...Vuex.mapState({
+      userId: state => state.logId
+    }),
+    filterArtical: function() {
+      let searchStrings = this.searchString.trim();
+      if (!this.$route.query.tag) {
+        this.taglist = '';
+      }
+      // console.log(this.$route.query.tag)
+      let article = !!this.taglist ? this.taglist : this.list;
+      // console.log(article)
+      if (!searchStrings) {
+        return article;
+        // this.$nextTick()
+        // return this.list
+      } else {
+        let articles_array = article.filter(function(item) {
+          return item.title.indexOf(searchStrings) !== -1;
+        });
+
+        return articles_array;
       }
     }
+  },
+  watch: {
+    newArticle: function(newVal, oldVal) {
+      // console.log(newVal)
+      if (newVal) this.list.push(newVal);
+    }
   }
-}
+};
 </script>
 <style>
+.item-action {
+  display: flex;
+  justify-content: space-between;
+}
+.edit-color {
+  color: #8fb0c9;
+}
+.edit-color:hover {
+  cursor: pointer;
+  color: #409eff;
+}
+.sticky-bar {
+  width: 100%;
+  background: #fff;
+  border-bottom: 1px solid #c4cdd4;
+  z-index: 500;
+}
+.container {
+  width: 90%;
+  max-width: 1800px;
+  margin: auto;
+}
+.sticky-body {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: start;
+  align-items: flex-start;
+  padding: 12px 0;
+}
+.sticky-body .tag-list {
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+  width: 200px;
+  margin-right: 10px;
+}
+
+.tag-list {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  height: 35px;
+  overflow: hidden;
+}
+.tag-list button {
+  flex: 1;
+  max-width: 100px;
+  margin: 0 10px 5px 0;
+  border-color: #e8eaee;
+  color: #576575;
+}
+
+.tag-list button:hover {
+  border-color: #8599ad;
+  color: #576575;
+}
+
+.tag-list button.el-button--primary {
+  border-color: #576575;
+  background: #576575;
+  color: #fff;
+  cursor: default;
+}
+
+.heightLight {
+  color: #409eff;
+}
 .interval {
   float: left;
   width: 1px;
@@ -84,7 +275,9 @@ export default {
   margin-left: 8px;
   margin-right: 8px;
 }
-
+.el-tag {
+  margin-right: 5px;
+}
 .oneline {
   overflow: hidden;
   text-overflow: ellipsis;

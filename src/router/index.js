@@ -1,8 +1,8 @@
-import Vue from 'vue';
-import VueRouter from 'vue-router';
+// import Vue from 'vue';
+// import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import store from '../store/index';
-Vue.use(VueRouter);
+// if (!window.VueRouter) Vue.use(VueRouter);
 /**
  * 重写路由的push方法防止点击同一个路由报错
  */
@@ -19,26 +19,43 @@ const routes = [{
         name: 'Home',
         component: Home,
         meta: { keepAlive: true },
-        props: { searchString: '' }
+        props: { searchString: '', newArticle: {} }
     },
     {
         path: '/home/:id',
         name: 'singleblog',
         meta: { keepAlive: false },
         component: () =>
-            import ( /* webpackChunkName: "about" */ '../views/SingleBlog.vue')
+            import ( /* webpackChunkName: "singleblog" */ '../views/SingleBlog.vue')
     },
     {
-        path: '/login',
-        name: 'login',
+        path: '/users/:id',
+        name: 'info',
+        meta: { keepAlive: false },
         component: () =>
-            import ( /* webpackChunkName: "about" */ '../views/Login.vue')
+            import ( /* webpackChunkName: "info" */ '../views/Info.vue')
+    },
+    {
+        path: '/markdown',
+        name: 'markdown',
+        props: { article: {} },
+        component: () =>
+            import ( /* webpackChunkName: "markdown" */ '../views/Markdown.vue')
     },
     {
         path: '/register',
         name: 'register',
         component: () =>
-            import ( /* webpackChunkName: "about" */ '../views/Register.vue')
+            import ( /* webpackChunkName: "register" */ '../views/Register.vue')
+    },
+    {
+        path: '/profile',
+        name: 'profile',
+        meta: {
+            requiresAuth: true
+        },
+        component: () =>
+            import ( /* webpackChunkName: "profile" */ '../views/Profile.vue')
     },
     {
         path: '/about',
@@ -54,6 +71,31 @@ const routes = [{
         name: 'Tag',
         component: () =>
             import ('../views/Tag.vue')
+    },
+    {
+        path: '/msg',
+        name: 'Message',
+        component: () =>
+            import ('../views/Message.vue'),
+        children: [{
+                path: 'reply',
+                name: 'reply',
+                component: () =>
+                    import ('../views/Reply.vue')
+            },
+            {
+                path: 'at',
+                name: 'at',
+                component: () =>
+                    import ('../views/At.vue')
+            },
+            {
+                path: 'like',
+                name: 'like',
+                component: () =>
+                    import ('../views/Like.vue')
+            }
+        ]
     },
     {
         path: '/msgboard',

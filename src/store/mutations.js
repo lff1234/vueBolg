@@ -1,23 +1,45 @@
 export default {
-    auth_request(state) {
-        state.status = 'loading';
-    },
-    auth_success(state, token, username, logid, avator) {
-        state.status = 'success';
-        state.token = token;
-        state.currentUser = username;
-        state.logId = logid;
+    auth_success(state, payload) {
+        // state.status = 'success';
+        state.token = payload.token;
+        state.currentUser = payload.username;
+        state.logId = payload.logid;
 
-        state.avator = avator;
+        if (payload.avator.indexOf('http') != -1) {
+            state.avator = payload.avator;
+        } else {
+            state.avator = '/api/' + payload.avator;
+        }
     },
-    auth_error(state) {
-        state.status = 'error';
-    },
+
     logout(state) {
         state.status = '';
         state.token = '';
+        state.avator = '';
+        state.logId = '';
     },
     UpdateCommentList(state, comment) {
         state.commentList = comment;
+    },
+    avatorChange(state, avator) {
+        if (avator.indexOf('http') != -1) {
+            state.avator = avator;
+        } else {
+            state.avator = '/api/' + avator;
+        }
+
+        sessionStorage.setItem('avator', state.avator);
+    },
+    statusChange(state, status) {
+        state.status = status;
+    },
+    setContent(state, item) {
+        state.content = item;
+    },
+    timechange(state, time) {
+        state.timer = time;
+    },
+    infoChange(state, obj) {
+        state.usrCard = obj;
     }
 };

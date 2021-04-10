@@ -34,9 +34,9 @@
 <script>
 import { request } from '../utils/network/request';
 import Upload from './Upload';
-// import { mapState } from 'vuex';
+
 export default {
-  name: 'Profile',
+  name: 'info',
   components: {
     Upload
   },
@@ -44,17 +44,12 @@ export default {
     return {
       isShow: false,
       showUpload: false,
-      imageUrl: ''
+      imageUrl: '',
+      headImg: '',
+      username: ''
     };
   },
 
-  computed: {
-    // ...mapState({
-    ...Vuex.mapState({
-      headImg: state => state.avator,
-      username: state => state.currentUser
-    })
-  },
   methods: {
     editImg() {
       this.showUpload = true;

@@ -1,21 +1,28 @@
 module.exports = {
     presets: [
-        // '@vue/cli-plugin-babel/preset',
-        [
-            '@vue/app',
-            {
-                useBuiltIns: 'entry'
-            }
-        ]
-    ],
-    plugins: [
+            // '@vue/cli-plugin-babel/preset',
             [
-                'component',
+                '@vue/app',
                 {
-                    libraryName: 'element-ui',
-                    styleLibraryName: 'theme-chalk'
+                    polyfills: ['es6.promise', 'es6.symbol']
                 }
             ]
+            // ['@babel/preset-env', { modules: false }]
+            // [
+            //     '@babel/preset-env',
+            //     {
+            //         useBuiltIns: 'entry'
+            //     }
+            // ]
         ]
-        // transpileDependencies: [/node_modules[/\\\\](element-ui|vuex|)[/\\\\]/]
+        // plugins: [
+        //     [
+        //         'component',
+        //         {
+        //             libraryName: 'element-ui',
+        //             styleLibraryName: 'theme-chalk'
+        //         }
+        //     ],
+        //     ['syntax-dynamic-import']
+        // ]
 };

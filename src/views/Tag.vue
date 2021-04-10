@@ -7,13 +7,13 @@
 </template>
 
 <script>
-import { request } from '../network/request'
+import { request } from '../utils/network/request';
 export default {
   name: 'Tag',
   data() {
     return {
       shiyan: ''
-    }
+    };
   },
   methods: {},
   created() {
@@ -22,11 +22,10 @@ export default {
     })
       .then(res => console.log(res))
       .catch(err => {
-        console.log(err)
-      })
+        console.log(err);
+      });
   }
-}
+};
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
