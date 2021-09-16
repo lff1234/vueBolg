@@ -14,8 +14,7 @@
             closable
             :disable-transitions="false"
             @close="handleClose(tag)"
-            >{{ tag }}</el-tag
-          >
+          >{{ tag }}</el-tag>
           <el-input
             class="input-new-tag"
             v-if="inputVisible"
@@ -25,13 +24,7 @@
             @keyup.enter.native="handleInputConfirm"
             @blur="handleInputConfirm"
           ></el-input>
-          <el-button
-            v-else
-            class="button-new-tag"
-            size="small"
-            @click="showInput"
-            >+ New Tag</el-button
-          >(限制为2个tag)
+          <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>(限制为2个tag,新写入的将替代第一个tag)
         </el-row>
       </el-form-item>
       <el-form-item label="文章标题:">
@@ -41,18 +34,14 @@
       </el-form-item>
       <el-form-item label="文章简介:">
         <el-col :span="6">
-          <el-input
-            type="textarea"
-            :autosize="{ minRows: 3, maxRows: 5 }"
-            v-model="form.intro"
-          ></el-input>
+          <el-input type="textarea" :autosize="{ minRows: 3, maxRows: 5 }" v-model="form.intro"></el-input>
         </el-col>
       </el-form-item>
       <el-form-item>
-        <span class="demonstration"
-          >注意：本博客文章目录是通过解析博文 HTML 中 h1～6
-          标签，并且记录层级关系，再进行展示markdown文档，所以请按照此规则进行编写以达到预期效果</span
-        >
+        <span class="demonstration">
+          注意：本博客文章目录是通过解析博文 HTML 中 h1～6
+          标签，并且记录层级关系，再进行展示markdown文档，所以请按照此规则进行编写以达到预期效果
+        </span>
       </el-form-item>
       <el-form-item>
         <mavon-editor
@@ -67,16 +56,8 @@
         ></mavon-editor>
       </el-form-item>
       <el-form-item>
-        <el-button
-          type="primary"
-          size="small"
-          v-show="!editable"
-          @click="submit()"
-          >发布</el-button
-        >
-        <el-button type="primary" size="small" v-show="editable" @click="save()"
-          >保存</el-button
-        >
+        <el-button type="primary" size="small" v-show="!editable" @click="submit()">发布</el-button>
+        <el-button type="primary" size="small" v-show="editable" @click="save()">保存</el-button>
       </el-form-item>
     </el-form>
     <!-- <article v-html="myhtml"></article> -->
@@ -84,8 +65,8 @@
 </template>
 
 <script>
-// import { mapState } from 'vuex';
-import { request } from '../utils/network/request';
+import { mapState } from 'vuex'
+import { request } from '../utils/network/request'
 export default {
   name: 'markdown',
   props: {
@@ -143,30 +124,30 @@ export default {
 
       inputVisible: false,
       inputValue: ''
-    };
+    }
   },
   computed: {
-    // ...mapState({
-    ...Vuex.mapState({
+    ...mapState({
+      // ...Vuex.mapState({
       username: state => state.currentUser,
       userId: state => state.logId
     })
   },
   mounted() {
     if (this.article) {
-      this.form = this.article;
-      this.editable = true;
+      this.form = this.article
+      this.editable = true
     }
   },
   methods: {
     imgAdd(pos, $file) {
       //添加图片，pos为位置
       // let markdownImg = {},
-      let $vm = this.$refs.md;
+      let $vm = this.$refs.md
       // markdownImg.base64Data = file.miniurl; //获取图片base64内容
       // markdownImg.type = file.type;
-      let formdata = new FormData();
-      formdata.append('image', $file);
+      let formdata = new FormData()
+      formdata.append('image', $file)
       request({
         method: 'post',
         url: '/api/articleImgUpload',
@@ -175,16 +156,16 @@ export default {
       })
         .then(r => {
           // console.log(process.env.VUE_APP_BASE_API)
-          $vm.$img2Url(pos, '/api/' + r);
+          $vm.$img2Url(pos, '/api/' + r)
         })
         .catch(e => {
-          console.log(e);
-        });
+          console.log(e)
+        })
     },
     imgDel(pos, url) {
       //删除图片，并不是修改就会触发，仅支持工具栏操作
-      console.log(pos);
-      console.log(url);
+      console.log(pos)
+      console.log(url)
     },
     // 所有操作都会被解析重新渲染
     handle(value, render) {
@@ -193,7 +174,7 @@ export default {
     },
     //保存修改并提交
     save() {
-      let date = new Date();
+      let date = new Date()
       request({
         url: '/api/editArticle',
         method: 'post',
@@ -212,23 +193,23 @@ export default {
               showClose: true,
               type: 'success',
               message: res.msg
-            });
-            this.$router.push({ path: '/home' });
+            })
+            this.$router.push({ path: '/home' })
           } else {
             this.$message({
               showClose: true,
               type: 'warning',
               message: res.msg
-            });
+            })
           }
         })
         .catch(err => {
-          console.log(err);
-        });
+          console.log(err)
+        })
     },
     // 提交
     submit() {
-      let date = new Date();
+      let date = new Date()
 
       request({
         url: '/api/addArticle',
@@ -248,45 +229,45 @@ export default {
               showClose: true,
               type: 'success',
               message: res.msg
-            });
-            this.$router.push({ path: '/home' });
-            this.$route.matched[0].props.default.newArticle = res.data;
+            })
+            this.$router.push({ path: '/home' })
+            this.$route.matched[0].props.default.newArticle = res.data
           } else {
             this.$message({
               showClose: true,
               type: 'warning',
               message: res.msg
-            });
+            })
           }
         })
         .catch(err => {
-          console.log(err);
-        });
+          console.log(err)
+        })
       // console.log(this.form.content)
       // console.log(this.form.html)
     },
     handleClose(tag) {
-      this.form.tags.splice(this.form.tags.indexOf(tag), 1);
+      this.form.tags.splice(this.form.tags.indexOf(tag), 1)
     },
 
     showInput() {
-      this.inputVisible = true;
+      this.inputVisible = true
       this.$nextTick(_ => {
-        this.$refs.saveTagInput.$refs.input.focus();
-      });
+        this.$refs.saveTagInput.$refs.input.focus()
+      })
     },
 
     handleInputConfirm() {
-      let inputValue = this.inputValue;
+      let inputValue = this.inputValue
       if (inputValue) {
-        this.form.tags.push(inputValue);
-        if (this.form.tags.length > 2) this.form.tags.shift();
+        this.form.tags.push(inputValue)
+        if (this.form.tags.length > 2) this.form.tags.shift()
       }
-      this.inputVisible = false;
-      this.inputValue = '';
+      this.inputVisible = false
+      this.inputValue = ''
     }
   }
-};
+}
 </script>
 
 <style scoped>

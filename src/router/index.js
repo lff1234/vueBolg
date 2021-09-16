@@ -1,8 +1,8 @@
-// import Vue from 'vue';
-// import VueRouter from 'vue-router';
+import Vue from 'vue';
+import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import store from '../store/index';
-// if (!window.VueRouter) Vue.use(VueRouter);
+if (!window.VueRouter) Vue.use(VueRouter);
 /**
  * 重写路由的push方法防止点击同一个路由报错
  */

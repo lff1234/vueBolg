@@ -9,15 +9,15 @@
       >
         <div class="ai-center">
           <h2 class="flex-1">{{ blog.title }}</h2>
-          <span class="col-grey" @click="showToc()" v-show="showTocs"
-            >「 显示目录 」</span
-          >
+          <span class="col-grey" @click="showToc()" v-show="showTocs">「 显示目录 」</span>
         </div>
         <article v-html="marked(blog.contentMd)"></article>
       </div>
       <div class="blog-menu .toc-sticky" v-show="!showTocs">
         <div class="ai-center">
-          <h2><i class="color-primary">#</i>TOC</h2>
+          <h2>
+            <i class="color-primary">#</i>TOC
+          </h2>
           <span class="col-grey" @click="showToc()">「 隐藏目录 」</span>
         </div>
         <div
@@ -28,9 +28,7 @@
             paddingLeft: `${item.indent}em`
           }"
           @click="scrollTo(item.id)"
-        >
-          {{ item.text }}
-        </div>
+        >{{ item.text }}</div>
       </div>
     </div>
     <comment v-if="flag" :articleId="blog._id" />
@@ -42,11 +40,11 @@
 </template>
 
 <script>
-import 'github-markdown-css';
-import { request } from '../utils/network/request';
-import Comment from '../components/content/Comment';
-// import { mapState } from 'vuex';
-import marked from '../utils/marked';
+import 'github-markdown-css'
+import { request } from '../utils/network/request'
+import Comment from '../components/content/Comment'
+import { mapState } from 'vuex'
+import marked from '../utils/marked'
 export default {
   name: 'singleblog',
   data() {
@@ -58,7 +56,7 @@ export default {
       showTocs: false,
       articleToc: [],
       alwaysShow: true
-    };
+    }
   },
   components: {
     Comment
@@ -71,7 +69,7 @@ export default {
           this.$store.state,
           JSON.parse(sessionStorage.getItem('store'))
         )
-      );
+      )
     }
     // if (sessionStorage.getItem(this.$route.params.id)) {
     //   // this.comments = JSON.parse(sessionStorage.getItem(this.$route.params.id))
@@ -83,32 +81,32 @@ export default {
       url: '/api/home/' + this.blogid
     })
       .then(res => {
-        this.comment = res.data.comment;
+        this.comment = res.data.comment
         // console.log(this.comment)
-        this.$store.commit('UpdateCommentList', res.data.comment);
+        this.$store.commit('UpdateCommentList', res.data.comment)
         // console.log(this.$store.state.commentList)
-        this.flag = true;
+        this.flag = true
       })
       .catch(err => {
-        console.log(err);
-      });
+        console.log(err)
+      })
   },
   computed: {
-    // ...mapState({
-    ...Vuex.mapState({
+    ...mapState({
+      // ...Vuex.mapState({
       blog: state => state.content
     })
   },
   mounted() {
-    this.init();
+    this.init()
     window.onbeforeunload = () => {
-      sessionStorage.setItem('store', JSON.stringify(this.$store.state));
+      sessionStorage.setItem('store', JSON.stringify(this.$store.state))
       // sessionStorage.removeItem('commentList')
       // sessionStorage.setItem(
       //   this.$route.params.id,
       //   JSON.stringify(this.$store.state.content)
       // )
-    };
+    }
   },
   // watch: {
   //   $route(to, from) {
@@ -129,25 +127,25 @@ export default {
   // },
   methods: {
     showToc() {
-      this.showTocs = !this.showTocs;
+      this.showTocs = !this.showTocs
     },
     init() {
-      this.articleToc = this.blog.toc;
+      this.articleToc = this.blog.toc
     },
     scrollTo(id) {
       // 绑定 toc 点击事件
-      let node = document.querySelector('[data-id="' + id + '"]');
+      let node = document.querySelector('[data-id="' + id + '"]')
       if (!node) {
-        return;
+        return
       }
       node.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
         inline: 'nearest'
-      });
+      })
     }
   }
-};
+}
 </script>
 
 <style scoped>

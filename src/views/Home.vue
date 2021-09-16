@@ -7,16 +7,14 @@
             @click="switchTag('')"
             size="small"
             :type="!$route.query.tag ? 'primary' : 'default'"
-            >全部</el-button
-          >
+          >全部</el-button>
           <el-button
             v-for="(tag, index) in tagList"
             :key="index"
             :type="$route.query.tag === tag ? 'primary' : 'default'"
             size="small"
             @click="switchTag(tag)"
-            >{{ tag }}</el-button
-          >
+          >{{ tag }}</el-button>
         </div>
       </div>
     </div>
@@ -24,10 +22,7 @@
       <li v-for="item in filterArtical" :key="item.id">
         <div class="item-content">
           <router-link class="title" :to="{ path: `/home/${item.id}` }">
-            <span
-              v-html="brightenKeyword(item.title)"
-              @click="view(item)"
-            ></span>
+            <span v-html="brightenKeyword(item.title)" @click="view(item)"></span>
           </router-link>
           <article class="oneline">{{ item.intro || item.contentMd }}</article>
           <div class="item-action">
@@ -42,8 +37,7 @@
                   :type="$route.query.tag === tag ? 'info' : 'warning'"
                   size="mini"
                   :effect="$route.query.tag === tag ? 'dark' : 'plain'"
-                  >{{ tag }}</el-tag
-                >
+                >{{ tag }}</el-tag>
               </span>
               <!-- <div class="interval"></div> -->
               <span>作者：{{ item.username }}</span>
@@ -52,8 +46,7 @@
               class="edit-color"
               @click="editMd(item)"
               v-show="userId && item.userid == userId"
-              >编辑</span
-            >
+            >编辑</span>
           </div>
         </div>
       </li>
@@ -63,9 +56,9 @@
 
 <script>
 // @ is an alias to /src
-// import { mapState } from 'vuex';
-import { request } from '../utils/network/request';
-import buildToc from '../utils/build_toc';
+import { mapState } from 'vuex'
+import { request } from '../utils/network/request'
+import buildToc from '../utils/build_toc'
 export default {
   name: 'Home',
   components: {},
@@ -83,7 +76,7 @@ export default {
       search: [],
       tagList: ['vue.js', 'mongoose', 'java', 'c++', 'go'],
       taglist: ''
-    };
+    }
   },
   created() {
     request({
@@ -93,109 +86,109 @@ export default {
         // this.list = data
         // console.log(data)
         for (let val of data) {
-          this.list.push(val);
+          this.list.push(val)
         }
       })
       .catch(err => {
-        console.log(err);
-      });
+        console.log(err)
+      })
   },
   filters: {
     newDate: function(val) {
       // console.log(typeof val)
-      let d = new Date(parseInt(Date.parse(val)));
-      d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+      let d = new Date(parseInt(Date.parse(val)))
+      d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
       return d
         .toISOString()
         .replace(/T/g, ' ')
-        .replace(/\.[\d]{3}Z/, '');
+        .replace(/\.[\d]{3}Z/, '')
     }
   },
   methods: {
     editMd(item) {
-      console.log(item);
-      this.$router.push('/markdown');
-      this.$route.matched[0].props.default.article = item;
+      // console.log(item)
+      this.$router.push('/markdown')
+      this.$route.matched[0].props.default.article = item
     },
     brightenKeyword(val) {
-      let searchStrings = this.searchString.trim();
+      let searchStrings = this.searchString.trim()
       let transformString = searchStrings.replace(
         /[.[*?+^$|()/]|\]|\\/g,
         '\\$&'
-      );
-      let replaceReg = new RegExp(transformString, 'g');
+      )
+      let replaceReg = new RegExp(transformString, 'g')
       let replaceString =
-        '<span class="heightLight">' + searchStrings + '</span>';
+        '<span class="heightLight">' + searchStrings + '</span>'
       if (val) {
-        return val.replace(replaceReg, replaceString);
+        return val.replace(replaceReg, replaceString)
       }
     },
     view(item) {
-      let tocData = buildToc(item.contentMd);
-      this.$set(item, 'toc', tocData.toc);
-      item.contentMd = tocData.article;
-      this.$store.commit('setContent', item);
+      let tocData = buildToc(item.contentMd)
+      this.$set(item, 'toc', tocData.toc)
+      item.contentMd = tocData.article
+      this.$store.commit('setContent', item)
       // console.log(item)
     },
     switchTag(tag) {
-      let query = {};
+      let query = {}
       // if (this.$route.query.type === 'list') {
       //   query.type = 'list'
       //   query.page = 1
       // }
       if (tag) {
-        query.tag = tag;
+        query.tag = tag
       }
       this.$router.replace({
         path: '/home',
         query
-      });
+      })
       // console.log(this.$route.query.tag)
 
       request({
         url: `/api/home?tag=${this.$route.query.tag}`
       })
         .then(res => {
-          this.taglist = res;
+          this.taglist = res
         })
         .catch(err => {
-          console.log(err);
-        });
+          console.log(err)
+        })
     }
   },
   computed: {
-    // ...mapState({
-    ...Vuex.mapState({
+    ...mapState({
+      //...Vuex.mapState({
       userId: state => state.logId
     }),
     filterArtical: function() {
-      let searchStrings = this.searchString.trim();
+      let searchStrings = this.searchString.trim()
       if (!this.$route.query.tag) {
-        this.taglist = '';
+        this.taglist = ''
       }
       // console.log(this.$route.query.tag)
-      let article = !!this.taglist ? this.taglist : this.list;
+      let article = !!this.taglist ? this.taglist : this.list
       // console.log(article)
       if (!searchStrings) {
-        return article;
+        return article
         // this.$nextTick()
         // return this.list
       } else {
         let articles_array = article.filter(function(item) {
-          return item.title.indexOf(searchStrings) !== -1;
-        });
+          return item.title.indexOf(searchStrings) !== -1
+        })
 
-        return articles_array;
+        return articles_array
       }
     }
   },
   watch: {
     newArticle: function(newVal, oldVal) {
       // console.log(newVal)
-      if (newVal) this.list.push(newVal);
+      if (newVal) this.list.push(newVal)
     }
   }
-};
+}
 </script>
 <style>
 .item-action {

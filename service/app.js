@@ -5,7 +5,7 @@ const path = require('path');
 const app = express();
 const mongoose = require('./util/mongoose');
 const db = mongoose();
-const vertoken = require('./util/token_vertify');
+// const vertoken = require('./util/token_vertify');
 const expressJwt = require('express-jwt');
 const router = require('./router/index.js');
 
@@ -104,5 +104,4 @@ app.use('/api/public', express.static(path.join(__dirname, 'public')));
 // 服务器已经启动
 app.listen('8700', function() {
     console.log('running...');
-    console.log(__dirname);
 });

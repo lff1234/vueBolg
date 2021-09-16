@@ -188,8 +188,8 @@ export default {
 }
 .closeButton {
   position: absolute;
-  top: -9px;
-  right: -20px;
+  top: -19px;
+  right: -40px;
   padding: 12px;
   background-color: transparent;
   color: aliceblue;

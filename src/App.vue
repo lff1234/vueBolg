@@ -42,21 +42,13 @@
               <router-link to="/msgboard">留言板</router-link>
             </li>
             <li>
-              <router-link
-                to="/markdown"
-                v-if="isLogin() && username.split(',')[1] == 'lff'"
-                >编写博客</router-link
-              >
+              <router-link to="/markdown" v-if="isLogin() && username.split(',')[1] == 'lff'">编写博客</router-link>
             </li>
           </ul>
         </div>
 
         <div class="search-box">
-          <input
-            class="search-box_ins"
-            placeholder="请搜索..."
-            v-model="content"
-          />
+          <input class="search-box_ins" placeholder="请搜索..." v-model="content" />
           <i class="icon" @click="searchArticle()">
             <svg
               class="Zi Zi--Search SearchBar-searchIcon"
@@ -78,9 +70,7 @@
         </div>
         <div class="userHome" v-else>
           <el-dropdown @command="handleMessages">
-            <router-link to="/msg" tag="div" class="msg-color"
-              >消息</router-link
-            >
+            <router-link to="/msg" tag="div" class="msg-color">消息</router-link>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="1">
                 <span>回复我的</span>
@@ -94,12 +84,7 @@
             </el-dropdown-menu>
           </el-dropdown>
           <el-dropdown @command="handleCommand">
-            <el-avatar
-              v-if="userImg"
-              :size="40"
-              :src="userImg"
-              :key="userImg"
-            ></el-avatar>
+            <el-avatar v-if="userImg" :size="40" :src="userImg" :key="userImg"></el-avatar>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="1">
                 <i class="el-icon-user-solid"></i>个人中心
@@ -130,9 +115,7 @@
         line-height: 40px;
         color: #1989fa;
       }"
-        >
-          UP
-        </div>
+        >UP</div>
       </el-backtop>
       <el-backtop>
         <i class="el-icon-caret-top"></i>
@@ -156,11 +139,7 @@
           </div>
         </div>
         <div class="follow-div clearfix">
-          <a
-            href="javascript:void(0)"
-            class="person_deliver person_deliver_letter_un"
-            >关注</a
-          >
+          <a href="javascript:void(0)" class="person_deliver person_deliver_letter_un">关注</a>
           <a class="visoter" target="_blank" href>访问主页</a>
           <a class="visoter" target="_blank" href>私信</a>
         </div>
@@ -171,8 +150,8 @@
 </template>
 
 <script>
-// import { mapState } from 'vuex';
-import Login from './views/Login';
+import { mapState } from 'vuex'
+import Login from './views/Login'
 
 export default {
   // provide() {
@@ -194,37 +173,37 @@ export default {
       isActive: false,
       staticClass: 'list',
       showCard: false
-    };
+    }
   },
   mounted() {},
   computed: {
-    // ...mapState({
-    ...Vuex.mapState({
+    ...mapState({
+      //...Vuex.mapState({
       options: state => state.usrCard,
       time: state => state.timer,
       userImg: state => state.avator,
       username: state => {
-        let currentTime = new Date().getHours();
+        let currentTime = new Date().getHours()
         switch (true) {
           case currentTime <= 12 && currentTime > 0:
-            return '上午好,' + state.currentUser;
+            return '上午好,' + state.currentUser
 
-            break;
+            break
           case currentTime <= 18 && currentTime > 12:
-            return '下午好,' + state.currentUser;
+            return '下午好,' + state.currentUser
 
-            break;
+            break
           default:
-            return '晚上好,' + state.currentUser;
+            return '晚上好,' + state.currentUser
         }
       }
     }),
     show: {
       get() {
-        return this.$store.state.status;
+        return this.$store.state.status
       },
       set(value) {
-        this.$store.commit('statusChange', value);
+        this.$store.commit('statusChange', value)
       }
     }
   },
@@ -233,9 +212,9 @@ export default {
       // console.log(this.$route.matched[0].props.default)
 
       if (this.$route.fullPath.indexOf('/home') == -1) {
-        this.searchContent = newValue;
+        this.searchContent = newValue
       } else {
-        this.$route.matched[0].props.default.searchString = newValue;
+        this.$route.matched[0].props.default.searchString = newValue
       }
 
       // console.log(this.$route.matched[0].props.default)
@@ -244,21 +223,21 @@ export default {
   methods: {
     showInfo() {
       // console.log(this.options);
-      if (this.time) clearTimeout(this.time);
-      this.showCard = true;
+      if (this.time) clearTimeout(this.time)
+      this.showCard = true
     },
     hideInfo() {
       let time = setTimeout(() => {
-        this.showCard = false;
-      }, 1000);
-      this.$store.commit('timechange', time);
+        this.showCard = false
+      }, 1000)
+      this.$store.commit('timechange', time)
     },
     slideDown() {
-      this.isActive = !this.isActive;
+      this.isActive = !this.isActive
     },
     searchArticle() {
-      this.$router.push('/home');
-      this.$route.matched[0].props.default.searchString = this.searchContent;
+      this.$router.push('/home')
+      this.$route.matched[0].props.default.searchString = this.searchContent
     },
     // reload() {
     //   this.$route.meta.keepAlive = true
@@ -268,10 +247,10 @@ export default {
     // },
     isLogin() {
       // console.log(this.$store.state.avator)
-      return this.$store.getters.isLoggedIn;
+      return this.$store.getters.isLoggedIn
     },
     login() {
-      this.show = true;
+      this.show = true
       // this.$router.push({
       //   path: '/login'
       // })
@@ -279,45 +258,45 @@ export default {
     register() {
       this.$router.push({
         path: '/register'
-      });
+      })
     },
     handleMessages(command) {
       switch (command) {
         case '1':
-          this.$router.push('/msg/reply');
-          break;
+          this.$router.push('/msg/reply')
+          break
         case '2':
-          this.$router.push('/msg/at');
-          break;
+          this.$router.push('/msg/at')
+          break
         case '3':
-          this.$router.push('/msg/like');
-          break;
+          this.$router.push('/msg/like')
+          break
         default:
-          this.$message.error('出错');
+          this.$message.error('出错')
       }
     },
     handleCommand(command) {
       switch (command) {
         case '1':
-          this.$router.push('/profile');
-          break;
+          this.$router.push('/profile')
+          break
         case '2':
-          this.logOut();
-          break;
+          this.logOut()
+          break
         default:
-          this.$message.error('出错');
+          this.$message.error('出错')
       }
     },
     logOut() {
       if (this.$route.fullPath == '/profile') {
-        this.$router.replace('/home');
+        this.$router.replace('/home')
       }
       this.$store.dispatch('LogOut').then(res => {
-        console.log(res);
-      });
+        console.log(res)
+      })
     }
   }
-};
+}
 </script>
 
 <style>
@@ -334,12 +313,7 @@ body {
   font-size: 16px;
   background: #f5f6f7;
 }
-.msg-color {
-  color: #fff;
-  margin: -10px 5px;
 
-  font-size: 14px;
-}
 .list .nav-more-btn {
   display: none;
 }
@@ -426,11 +400,39 @@ a:visited {
   content: '';
   clear: both;
 }
-@media screen and (max-width: 1090px) {
+ul,
+li {
+  list-style: none;
+}
+
+.list li {
+  float: left;
+  margin-right: 30px;
+}
+
+ul::after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+li a {
+  border-radius: 0.5em;
+
+  color: white;
+  text-align: center;
+  padding: 16px;
+  text-decoration: none;
+}
+
+li a:hover {
+  background-color: #888;
+}
+@media screen and (max-width: 1150px) {
   .userHome {
     margin-right: 10px;
   }
-  .userHome .msg {
+  .userHome .msg-color {
     display: none;
   }
   .list .nav-more-btn {
@@ -441,9 +443,10 @@ a:visited {
     top: 11px;
     right: 10px;
     border: none;
-    cursor: default;
+    cursor: pointer;
     background: #444;
   }
+
   .nav-slidedown .nav-more-btn i:first-child {
     transform: translateY(9px) rotate(-45deg);
   }
@@ -459,10 +462,13 @@ a:visited {
     right: 10px;
     width: 200px;
     background-color: #fff;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1), 1px 1px 2px rgba(0, 0, 0, 0.2);
-    transition: 0.2s ease-in-out;
+    /* box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1), 1px 1px 2px rgba(0, 0, 0, 0.2); */
     visibility: hidden;
     opacity: 0;
+  }
+  .list .list-body:hover {
+    background-color: transparent;
+    border: none;
   }
   .list .list-body li {
     float: none;
@@ -472,6 +478,7 @@ a:visited {
     display: inline-block;
     width: 100%;
     text-align: center;
+    border: 1px solid gold;
     color: #444;
     padding: 0;
   }
@@ -546,7 +553,7 @@ a:visited {
   padding: 0.7rem 1.5rem;
   line-height: 2.2rem;
   position: fixed;
-  height: 3.6rem;
+  height: 2.2rem;
   z-index: 1;
   left: 0;
   right: 0;
@@ -557,7 +564,6 @@ a:visited {
 .nav {
   display: flex;
   /* max-width: 1260px; */
-  align-items: center;
   justify-content: space-between;
   margin: 0 44px;
   align-items: center;
@@ -583,34 +589,6 @@ a:visited {
 
 .Button:hover {
   color: tomato;
-}
-
-ul,
-li {
-  list-style: none;
-}
-
-.list li {
-  float: left;
-  margin-right: 30px;
-}
-
-ul::after {
-  content: '';
-  display: block;
-  clear: both;
-}
-
-li a {
-  border-radius: 0.5em;
-  color: white;
-  text-align: center;
-  padding: 16px;
-  text-decoration: none;
-}
-
-li a:hover {
-  background-color: #888;
 }
 
 .el-main {
@@ -657,10 +635,21 @@ li a:hover {
   font-size: 12px;
 }
 .userHome {
-  margin-left: 20px;
-  margin-top: 5px;
+  /* position: relative; */
+  height: 100%;
+  vertical-align: bottom;
+  margin-bottom: 5px;
 }
-.userHome img {
+.msg-color {
+  color: #fff;
+  cursor: pointer;
+  margin: 5px 10px 3px 0px;
+  padding-top: 5px;
+  font-size: 16px;
+}
+.userHome .el-dropdown span {
+  vertical-align: middle;
+
   cursor: pointer;
 }
 .msg {
@@ -673,6 +662,9 @@ li a:hover {
     display: none;
   }
   .btn {
+    display: none;
+  }
+  .userHome {
     display: none;
   }
 }

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import store from '../../store/index';
 
-import { Message } from 'element-ui';
+// import { Message } from 'element-ui';
 // axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8';
 function getToken() {
     let tokenObj = {};
@@ -157,7 +157,7 @@ export function request(config) {
                             // console.log('else');
                             store.dispatch('LogOut').then(
                                 rs => {
-                                    Message.error('请重新登录');
+                                    ELEMENT.Message.error('请重新登录');
 
                                     store.commit('statusChange', true);
                                 }
