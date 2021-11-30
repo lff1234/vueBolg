@@ -4,16 +4,9 @@
       <div class="information">
         <p class="info-title">基本资料</p>
         <div class="info-head clearfix">
-          <div
-            class="info-avatar"
-            @mouseenter="enter"
-            @mouseleave="leave"
-            @click="editImg"
-          >
+          <div class="info-avatar" @mouseenter="enter" @mouseleave="leave" @click="editImg">
             <el-avatar :src="headImg" :size="60" :key="headImg"></el-avatar>
-            <el-avatar :size="60" class="avatar-editor" v-show="isShow"
-              >编辑头像</el-avatar
-            >
+            <el-avatar :size="60" class="avatar-editor" v-show="isShow">编辑头像</el-avatar>
           </div>
           <div class="info-describ">
             <div class="info-nickname">用户名：{{ username }}</div>
@@ -32,8 +25,8 @@
 </template>
 
 <script>
-import { request } from '../utils/network/request';
-import Upload from './Upload';
+import { request } from '../utils/network/request'
+import Upload from './Upload'
 
 export default {
   name: 'info',
@@ -47,31 +40,31 @@ export default {
       imageUrl: '',
       headImg: '',
       username: ''
-    };
+    }
   },
 
   methods: {
     editImg() {
-      this.showUpload = true;
+      this.showUpload = true
     },
     enter() {
       // console.log('enter:' + this.isShow)
-      this.isShow = true;
+      this.isShow = true
     },
     leave() {
       // console.log('leave:' + this.isShow)
-      this.isShow = false;
-    },
-    handleClose(done) {
-      // 关闭修改头像的弹窗
-      this.$confirm('确认取消?')
-        .then(_ => {
-          done();
-        })
-        .catch(_ => {});
+      this.isShow = false
     }
+    // handleClose(done) {
+    //   // 关闭修改头像的弹窗
+    //   this.$confirm('确认取消?')
+    //     .then(_ => {
+    //       done()
+    //     })
+    //     .catch(_ => {})
+    // }
   }
-};
+}
 </script>
 
 <style scoped>

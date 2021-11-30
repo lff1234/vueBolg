@@ -3,13 +3,26 @@ import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import store from '../store/index';
 if (!window.VueRouter) Vue.use(VueRouter);
+
 /**
  * 重写路由的push方法防止点击同一个路由报错
  */
-const routerPush = VueRouter.prototype.push;
-VueRouter.prototype.push = function push(location) {
-    return routerPush.call(this, location).catch(error => error);
+// const routerPush = VueRouter.prototype.push;
+// VueRouter.prototype.push = function push(location) {
+//     return routerPush.call(this, location).catch(error => error);
+// };
+
+/**
+ * 修改 vue-router 的push方法
+ */
+const originalPush = VueRouter.prototype.push;
+VueRouter.prototype.push = function push(location, onResolve, onReject) {
+    if (onResolve || onReject) {
+        return originalPush.call(this, location, onResolve, onReject);
+    }
+    return originalPush.call(this, location).catch(err => err);
 };
+
 const routes = [{
         path: '',
         redirect: '/home'
@@ -25,6 +38,7 @@ const routes = [{
         path: '/home/:id',
         name: 'singleblog',
         meta: { keepAlive: false },
+        props: { searchString: '', newArticle: {} },
         component: () =>
             import ( /* webpackChunkName: "singleblog" */ '../views/SingleBlog.vue')
     },

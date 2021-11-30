@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+// import { mapState } from 'vuex'
 import { request } from '../utils/network/request'
 export default {
   name: 'markdown',
@@ -127,8 +127,8 @@ export default {
     }
   },
   computed: {
-    ...mapState({
-      // ...Vuex.mapState({
+    // ...mapState({
+    ...Vuex.mapState({
       username: state => state.currentUser,
       userId: state => state.logId
     })

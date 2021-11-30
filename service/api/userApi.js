@@ -1,7 +1,7 @@
 const User = require('../util/schema/user_schema');
 const Comment = require('../util/schema/comment_schema');
 const Article = require('../util/schema/article_schema');
-const Bcrypt = require('bcrypt');
+const Bcrypt = require('bcryptjs');
 const settoken = require('../util/token_vertify');
 const fs = require('fs');
 /*
@@ -38,7 +38,7 @@ exports.articleImgUpload = async(req, res) => {
 };
 
 exports.imgUpload = async(req, res) => {
-    // console.log(req.file);
+    console.log(req.file);
     // console.log(req.body);
     let file = req.file;
     let imgName =
@@ -46,9 +46,14 @@ exports.imgUpload = async(req, res) => {
     // console.log(imgName);
     fs.renameSync('public/myUpload/' + file.filename, imgName); //这里修改文件名字
     let userMsg = await User.findOneAndUpdate({ _id: req.body.userId }, { $set: { avator: imgName } });
-    if (fs.readFileSync(userMsg.avator)) {
-        fs.unlinkSync(userMsg.avator);
+    try {
+        if (fs.readFileSync(userMsg.avator)) {
+            fs.unlinkSync(userMsg.avator);
+        }
+    } catch (err) {
+        console.log(err);
     }
+
     if (userMsg) {
         return res.json({
             data: {
@@ -90,7 +95,7 @@ exports.contentGet = async(req, res) => {
                                 if (String(m.fromId) === String(val._id)) {
                                     m['fromName'] = val.username;
                                     m['signature'] = val.signature;
-                                    if (val.avator.indexOf('http') == -1) {
+                                    if (val.avator != null && val.avator.indexOf('http') == -1) {
                                         m['fromHeadImg'] = '/api/' + val.avator;
                                     } else {
                                         m['fromHeadImg'] = val.avator;

@@ -1,5 +1,5 @@
 <template>
-  <div>reply</div>
+  <div>没人气，留言板再说</div>
 </template>
 
 <script>

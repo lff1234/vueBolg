@@ -43,7 +43,7 @@
 import 'github-markdown-css'
 import { request } from '../utils/network/request'
 import Comment from '../components/content/Comment'
-import { mapState } from 'vuex'
+// import { mapState } from 'vuex'
 import marked from '../utils/marked'
 export default {
   name: 'singleblog',
@@ -92,8 +92,8 @@ export default {
       })
   },
   computed: {
-    ...mapState({
-      // ...Vuex.mapState({
+    // ...mapState({
+    ...Vuex.mapState({
       blog: state => state.content
     })
   },

@@ -150,7 +150,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+// import { mapState } from 'vuex'
 import Login from './views/Login'
 
 export default {
@@ -177,8 +177,8 @@ export default {
   },
   mounted() {},
   computed: {
-    ...mapState({
-      //...Vuex.mapState({
+    // ...mapState({
+    ...Vuex.mapState({
       options: state => state.usrCard,
       time: state => state.timer,
       userImg: state => state.avator,
@@ -211,13 +211,15 @@ export default {
     content: function(newValue, oldValue) {
       // console.log(this.$route.matched[0].props.default)
 
-      if (this.$route.fullPath.indexOf('/home') == -1) {
+      if (this.$route.fullPath.indexOf('/home/') != -1) {
+        // console.log(this.$route.fullPath)
         this.searchContent = newValue
       } else {
+        // console.log(this.$route.matched[0])
         this.$route.matched[0].props.default.searchString = newValue
       }
 
-      // console.log(this.$route.matched[0].props.default)
+      // console.log(this.$route.matched[0])
     }
   },
   methods: {
@@ -237,6 +239,7 @@ export default {
     },
     searchArticle() {
       this.$router.push('/home')
+      // console.log(this.searchContent)
       this.$route.matched[0].props.default.searchString = this.searchContent
     },
     // reload() {
@@ -400,12 +403,9 @@ a:visited {
   content: '';
   clear: both;
 }
-ul,
-li {
-  list-style: none;
-}
 
 .list li {
+  list-style: none;
   float: left;
   margin-right: 30px;
 }
@@ -416,7 +416,7 @@ ul::after {
   clear: both;
 }
 
-li a {
+.list li a {
   border-radius: 0.5em;
 
   color: white;
@@ -461,15 +461,12 @@ li a:hover {
     top: 60px;
     right: 10px;
     width: 200px;
-    background-color: #fff;
+    background-color: transparent;
     /* box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1), 1px 1px 2px rgba(0, 0, 0, 0.2); */
     visibility: hidden;
     opacity: 0;
   }
-  .list .list-body:hover {
-    background-color: transparent;
-    border: none;
-  }
+
   .list .list-body li {
     float: none;
     margin: 0;
@@ -480,6 +477,7 @@ li a:hover {
     text-align: center;
     border: 1px solid gold;
     color: #444;
+    background-color: #fff;
     padding: 0;
   }
   .el-backtop {

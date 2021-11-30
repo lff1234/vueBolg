@@ -4,7 +4,8 @@ const config = require('./db');
 module.exports = () => {
     mongoose.connect(config.mongodb, {
         useNewUrlParser: true,
-        useUnifiedTopology: true
+        useUnifiedTopology: true,
+        useFindAndModify: true
     });
     const db = mongoose.connection;
     db.on('error', console.error.bind(console, '连接错误'));

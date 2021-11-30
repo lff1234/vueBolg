@@ -33,6 +33,9 @@ export default {
     statusChange(state, status) {
         state.status = status;
     },
+    setAvator(state) {
+        state.originalAvator = sessionStorage.getItem('originalAvator');
+    },
     setContent(state, item) {
         state.content = item;
     },

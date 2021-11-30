@@ -56,7 +56,7 @@
 
 <script>
 // @ is an alias to /src
-import { mapState } from 'vuex'
+// import { mapState } from 'vuex'
 import { request } from '../utils/network/request'
 import buildToc from '../utils/build_toc'
 export default {
@@ -75,29 +75,43 @@ export default {
       list: [],
       search: [],
       tagList: ['vue.js', 'mongoose', 'java', 'c++', 'go'],
-      taglist: ''
+      taglist: []
     }
   },
   created() {
-    request({
-      url: '/api/home'
-    })
-      .then(data => {
-        // this.list = data
-        // console.log(data)
-        for (let val of data) {
-          this.list.push(val)
-        }
+    if (this.$route.fullPath.indexOf('tag') != -1) {
+      request({
+        url: `/api/home?tag=${encodeURIComponent(this.$route.query.tag)}`
       })
-      .catch(err => {
-        console.log(err)
+        .then(res => {
+          this.taglist = res
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    } else {
+      request({
+        url: '/api/home'
       })
+        .then(data => {
+          // this.list = data
+          // console.log(data)
+          for (let val of data) {
+            this.list.push(val)
+          }
+          sessionStorage.setItem('articleList', JSON.stringify(this.list))
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    }
   },
   filters: {
     newDate: function(val) {
-      // console.log(typeof val)
+      // console.log(typeof val);
       let d = new Date(parseInt(Date.parse(val)))
       d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+      // console.log(d);
       return d
         .toISOString()
         .replace(/T/g, ' ')
@@ -128,7 +142,6 @@ export default {
       this.$set(item, 'toc', tocData.toc)
       item.contentMd = tocData.article
       this.$store.commit('setContent', item)
-      // console.log(item)
     },
     switchTag(tag) {
       let query = {}
@@ -143,31 +156,41 @@ export default {
         path: '/home',
         query
       })
+
+      this.taglist = this.articlelist.filter((val, index, arr) => {
+        return val.tags.includes(tag)
+      })
+      // console.log(this.articlelist)
       // console.log(this.$route.query.tag)
 
-      request({
-        url: `/api/home?tag=${this.$route.query.tag}`
-      })
-        .then(res => {
-          this.taglist = res
-        })
-        .catch(err => {
-          console.log(err)
-        })
+      //   request({
+      //     url: `/api/home?tag=${this.$route.query.tag}`
+      //   })
+      //     .then(res => {
+      //       this.taglist = res
+      //     })
+      //     .catch(err => {
+      //       console.log(err)
+      //     })
     }
   },
   computed: {
-    ...mapState({
-      //...Vuex.mapState({
+    // ...mapState({
+    ...Vuex.mapState({
+      // articlelist: state => state.lists,
       userId: state => state.logId
     }),
+    articlelist() {
+      let m = this.$store.state.lists
+      if (this.$store.state.lists instanceof Array) {
+        return this.list
+      } else {
+        return JSON.parse(m)
+      }
+    },
     filterArtical: function() {
       let searchStrings = this.searchString.trim()
-      if (!this.$route.query.tag) {
-        this.taglist = ''
-      }
-      // console.log(this.$route.query.tag)
-      let article = !!this.taglist ? this.taglist : this.list
+      let article = this.$route.query.tag ? this.taglist : this.articlelist
       // console.log(article)
       if (!searchStrings) {
         return article
@@ -282,6 +305,7 @@ export default {
 }
 
 .home ul {
+  list-style: none;
   display: flex;
   margin: 0 auto;
   flex-direction: column;

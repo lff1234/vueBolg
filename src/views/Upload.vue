@@ -15,10 +15,10 @@
           :http-request="uploadSectionImg"
           accept=".jpg, .jpeg, .png"
         >
-          <div v-if="imageUrl">
+          <div v-if="imageUrl" class="clear">
             <img :src="imageUrl" class="avatar" />
-            <el-button size="small" type="success" @click.stop="submitUpload">上传并保存</el-button>
-            <el-button size="small" @click.stop="cancleSelection">取消上传</el-button>
+            <el-button size="small" type="success" @click.stop="submitUpload" class="tt">上传并保存</el-button>
+            <el-button size="small" @click.stop="cancleSelection" class="tt">取消上传</el-button>
           </div>
 
           <div v-else>
@@ -196,10 +196,18 @@ export default {
 }
 
 .avatar {
+  float: left;
   width: 170px;
   height: 170px;
-  /* vertical-align: bottom; */
 
+  /* vertical-align: bottom; */
+}
+.clear::after {
+  content: '';
   display: block;
+  clear: both;
+}
+.tt {
+  margin-top: 140px;
 }
 </style>

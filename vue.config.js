@@ -30,25 +30,26 @@ const cdn = {
         'https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js',
         'https://cdn.bootcdn.net/ajax/libs/vuex/3.1.3/vuex.min.js',
         'https://cdn.staticfile.org/vue-router/3.1.6/vue-router.min.js',
-        'https://unpkg.com/axios/dist/axios.min.js>',
+        'https://unpkg.com/axios/dist/axios.min.js',
         'https://unpkg.com/element-ui@2.14.1/lib/index.js',
         'https://cdn.jsdelivr.net/npm/proxy-polyfill@0.3.0/proxy.min.js'
     ]
 };
 module.exports = {
-    // pages: {
-    //     index: {
-    //         // page 的入口
-    //         entry: 'src/main.js',
-    //         // 模板来源
-    //         template: './index.ejs',
-    //         // 在 dist/index.html 的输出
-    //         filename: 'index.html'
-    //     }
-    // },
+    pages: {
+        index: {
+            // page 的入口
+            entry: 'src/main.js',
+            // 模板来源
+            template: 'public/index.html',
+            // 在 dist/index.html 的输出
+            filename: 'index.html',
+            cdn: cdn
+        }
+    },
     lintOnSave: true,
     productionSourceMap: false,
-    publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
+    publicPath: process.env.NODE_ENV === 'production' ? '/' : '/',
     configureWebpack: {
         resolve: {
             // 针对 Npm 中的第三方模块优先采用 jsnext:main 中指向的 ES6 模块化语法的文件
@@ -60,11 +61,7 @@ module.exports = {
         plugins: [
             // 开启 Scope Hoisting
             new ModuleConcatenationPlugin(),
-            new HtmlWebpackPlugin({
-                // template: path.join(__dirname, './public/index.html'),
-                // filename: 'index.html',
-                title: 'haha'
-            }),
+            new HtmlWebpackPlugin({}),
             new BundleAnalyzerPlugin()
         ]
     },
@@ -75,21 +72,21 @@ module.exports = {
         // 生产环境相关配置
         if (isProduction) {
             // 代码压缩
-            // config.plugins.push(
-            //     new UglifyJsPlugin({
-            //         uglifyOptions: {
-            //             //生产环境自动删除console
-            //             compress: {
-            //                 // warnings: false, // 若打包错误，则注释这行
-            //                 drop_debugger: true,
-            //                 drop_console: true,
-            //                 pure_funcs: ['console.log']
-            //             }
-            //         },
-            //         sourceMap: false,
-            //         parallel: true
-            //     })
-            // );
+            config.plugins.push(
+                new UglifyJsPlugin({
+                    uglifyOptions: {
+                        //生产环境自动删除console
+                        compress: {
+                            // warnings: false, // 若打包错误，则注释这行
+                            drop_debugger: true,
+                            drop_console: true,
+                            pure_funcs: ['console.log']
+                        }
+                    },
+                    sourceMap: false,
+                    parallel: true
+                })
+            );
             config.performance = { hints: false };
             // gzip压缩
             const productionGzipExtensions = ['html', 'js', 'css'];
@@ -103,40 +100,40 @@ module.exports = {
                     deleteOriginalAssets: false // 删除原文件
                 })
             );
-            // 公共代码抽离
-            config.optimization = {
-                splitChunks: {
-                    cacheGroups: {
-                        vendor: {
-                            chunks: 'all',
-                            test: /node_modules/,
-                            name: 'vendor',
-                            minChunks: 1,
-                            maxInitialRequests: 5,
-                            minSize: 0,
-                            priority: 100
-                        },
-                        common: {
-                            chunks: 'all',
-                            test: /[\\/]src[\\/]js[\\/]/,
-                            name: 'common',
-                            minChunks: 2,
-                            maxInitialRequests: 5,
-                            minSize: 0,
-                            priority: 60
-                        },
-                        styles: {
-                            name: 'styles',
-                            test: /\.(sa|sc|c)ss$/,
-                            chunks: 'all',
-                            enforce: true
-                        },
-                        runtimeChunk: {
-                            name: 'manifest'
-                        }
-                    }
-                }
-            };
+            //公共代码抽离;
+            // config.optimization = {
+            //     splitChunks: {
+            //         cacheGroups: {
+            //             vendor: {
+            //                 chunks: 'all',
+            //                 test: /node_modules/,
+            //                 name: 'vendor',
+            //                 minChunks: 1,
+            //                 maxInitialRequests: 5,
+            //                 minSize: 0,
+            //                 priority: 100
+            //             },
+            //             common: {
+            //                 chunks: 'all',
+            //                 test: /[\\/]src[\\/]js[\\/]/,
+            //                 name: 'common',
+            //                 minChunks: 2,
+            //                 maxInitialRequests: 5,
+            //                 minSize: 0,
+            //                 priority: 60
+            //             },
+            //             styles: {
+            //                 name: 'styles',
+            //                 test: /\.(sa|sc|c)ss$/,
+            //                 chunks: 'all',
+            //                 enforce: true
+            //             },
+            //             runtimeChunk: {
+            //                 name: 'manifest'
+            //             }
+            //         }
+            //     }
+            // };
         }
     },
     chainWebpack: config => {
@@ -147,6 +144,11 @@ module.exports = {
         //     }]);
         // }
         // config.plugins.delete('preload');
+        config.module
+            .rule('images')
+            .use('url-loader')
+            .loader('url-loader')
+            .tap(options => Object.assign(options, { limit: 10240 }));
         // ============压缩图片 start============
         config.module
             .rule('images')
@@ -158,30 +160,30 @@ module.exports = {
 
         // ============注入cdn start============
         // 生产环境或本地需要cdn时，才注入cdn
-
-        config.plugin('html').tap(args => {
-            if (isProduction || devNeedCdn)
-            // args[0].template = './index.ejs';
+        if (isProduction || devNeedCdn) {
+            config.plugin('html').tap(args => {
+                // args[0].template = './index.ejs';
                 args[0].cdn = cdn;
-            return args;
-        });
+                return args;
+            });
+        }
     },
     chainWebpack(config) {
         config.entry('main').add('babel-polyfill');
-    },
-    devServer: {
-        host: 'localhost',
-        port: 3000,
-        proxy: {
-            '/api': {
-                target: 'http://localhost:8700',
-                changeOrigin: true,
-                ws: true,
-                pathRewrite: {
-                    '^/api': '/api'
-                }
-            }
-        }
     }
+    // devServer: {
+    //     host: 'localhost',
+    //     // port: 3000,
+    //     proxy: {
+    //         '/api': {
+    //             target: 'http://localhost:8700',
+    //             changeOrigin: true,
+    //             ws: true,
+    //             pathRewrite: {
+    //                 '^/api': '/api'
+    //             }
+    //         }
+    //     }
+    // }
     // transpileDependencies: [/node_modules[/\\\\](element-ui|vuex|)[/\\\\]/]
 };
