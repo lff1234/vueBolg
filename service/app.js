@@ -52,7 +52,7 @@ app.use(
                     url: /^\/api\/public\/myUpload(\/.+){0,}?/,
                     methods: ['GET']
                 },
-
+                { url: /^\/api\/home(\/tag)?/, methods: ['POST'] },
                 '/api/logout',
                 '/api/login',
                 '/api/register',

@@ -2,22 +2,6 @@
   <el-container>
     <el-header>
       <div class="nav">
-        <!-- <div class="sidebar-button">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-            role="img"
-            viewBox="0 0 448 512"
-            width="18"
-            height="18"
-          >
-            <path
-              fill="currentColor"
-              d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"
-            />
-          </svg>
-        </div>-->
-
         <div class="maintab">
           <img src="./assets/images/show3.png" width="54px" height="55px" />
         </div>
@@ -311,7 +295,7 @@ export default {
 }
 
 body {
-  /* min-width: 1116px; */
+  min-width: 980px;
   line-height: 24px;
   font-size: 16px;
   background: #f5f6f7;

@@ -69,7 +69,7 @@
             />
           </i>
 
-          <!-- <i class="iconfont el-icon-thumb" :class="{active:item.isLike}"></i> -->
+          <!-- <i class="iconfont el-icon-chat-dot-roundel-icon-thumb" :class="{active:item.isLike}"></i> -->
           <span class="like-num">{{ item.like > 0 ? item.like + '人赞' : '点赞' }}</span>
         </span>
       </div>
@@ -78,9 +78,33 @@
           <span class="reply" v-html="item.content"></span>
         </p>
       </div>
+      <div v-show="_inputShow(item,i)" class="my-reply my-comment-reply">
+        <el-avatar class="header-img" :size="40" :src="!myId?'':myHeader"></el-avatar>
+        <div class="reply-info">
+          <div
+            tabindex="0"
+            contenteditable="true"
+            spellcheck="false"
+            :placeholder="replyed"
+            @input="onDivInput($event)"
+            class="reply-input reply-comment-input"
+            v-focus="comments[i].inputShow"
+            v-clickoutside="hideReply.bind(this,i)"
+          ></div>
+        </div>
+        <div class="reply-btn-box">
+          <el-button
+            class="reply-btn"
+            size="medium"
+            @click.stop="sendCommentReply(i)"
+            type="primary"
+          >发表评论</el-button>
+        </div>
+      </div>
+
       <div class="reply-box">
         <div v-for="(reply, j) in item.reply" :key="j" :data-id="reply._id">
-          <div v-if="!pullDown || j < 3" class="author-title">
+          <div v-show="!pullDown || j < 3" class="author-title">
             <!-- <el-avatar class="header-img" :size="40" :src="reply.fromHeadImg"></el-avatar> -->
             <a @mouseover="showInfoCard($event, reply)" @mouseout="hideInfoCard()">
               <el-avatar class="header-img" :size="40" :src="reply.fromHeadImg"></el-avatar>
@@ -91,7 +115,7 @@
               <span class="author-time">{{ dateStr(reply.time) }}</span>
             </div>
             <div class="icon-btn">
-              <span @click.stop="showReplyInput(reply, i)">
+              <span @click.stop="showReplyInputs(reply, i,j)">
                 <i class="iconfont el-icon-chat-dot-round"></i>
                 回复
               </span>
@@ -121,18 +145,52 @@
             </div>
             <div class="talk-box">
               <p>
-                <span>回复 {{ reply.toName }}:</span>
+                <span class="text">回复</span>
+                <span>{{ reply.toName }}:</span>
+
                 <span class="reply" v-html="reply.content"></span>
               </p>
             </div>
           </div>
-        </div>
-        <div class="comment-rest" v-if="item.reply.length > 3">
-          <span v-if="pullDown" @click.stop="setPullDown(false)">显示全部{{ item.reply.length }}条</span>
-          <span v-else @click.stop="setPullDown(true)">收起评论</span>
+          <div v-show="_inputShow1(reply,i,j)" class="my-reply my-comment-reply">
+            <el-avatar class="header-img" :size="40" :src="!myId?'':myHeader"></el-avatar>
+            <div class="reply-info">
+              <div
+                tabindex="0"
+                contenteditable="true"
+                spellcheck="false"
+                :placeholder="replyed"
+                @input="onDivInput($event)"
+                class="reply-input reply-comment-input"
+                v-focus="comments[i].reply[j].inputShow"
+                v-clickoutside="hideReply.bind(this,i,j)"
+              ></div>
+            </div>
+            <div class="reply-btn-box">
+              <el-button
+                class="reply-btn"
+                size="medium"
+                @click.stop="sendCommentReply(i)"
+                type="primary"
+              >发表评论</el-button>
+            </div>
+          </div>
         </div>
       </div>
-      <div v-show="_inputShow(i)" class="my-reply my-comment-reply">
+
+      <div class="comment-rest" v-if="item.reply.length > 3">
+        <span v-if="pullDown" @click.stop="setPullDown(false)">
+          显示全部{{ item.reply.length }}条
+          <i class="el-icon-arrow-down"></i>
+        </span>
+        <span v-else @click.stop="setPullDown(true)">
+          收起评论
+          <i class="el-icon-arrow-up"></i>
+        </span>
+      </div>
+    </div>
+
+    <!-- <div v-show="_inputShow(i)" class="my-reply my-comment-reply">
         <el-avatar class="header-img" :size="40" :src="myHeader"></el-avatar>
         <div class="reply-info">
           <div
@@ -155,8 +213,7 @@
           >发表评论</el-button>
         </div>
       </div>
-    </div>
-
+    </div>-->
     <el-pagination
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
@@ -178,15 +235,16 @@ const clickoutside = {
     function documentHandler(e) {
       // 这里判断点击的元素是否是本身，是本身，则返回
 
-      if (el.contains(e.target)) {
+      if (el.isEqualNode(e.target)) {
         return false
       }
-
+      // console.log(el)
       // 判断指令中是否绑定了函数
 
       if (binding.expression) {
         // console.log(el, e.target)
         // 如果绑定了函数 则调用那个函数，此处binding.value就是handleClose方法
+
         binding.value()
         // console.log(el.innerHTML)
         el.innerHTML = ''
@@ -225,7 +283,7 @@ export default {
       pagesize: 10, //    每页的数据
       replyed: '',
       btnShow: false,
-      replyShow: false,
+
       index: '0',
       replyComment: '',
       to: '',
@@ -274,9 +332,11 @@ export default {
 
   mounted() {
     for (let item of this.comments) {
-      // console.log(this.comments.inputShow)
       // console.log(item)
       this.$set(item, 'inputShow', false)
+      for (let val of item.reply) {
+        this.$set(val, 'inputShow', false)
+      }
     }
 
     // document.onclick = e => {
@@ -361,15 +421,20 @@ export default {
       this.currentPage = currentPage
       // console.log(this.currentPage) //点击第几页
     },
-    hideReply() {
-      this.replyShow = false
-      // this.comments[i].inputShow = false
-      for (let item of this.comments) {
-        // console.log(this.comments.inputShow)
-        // console.log(item)
-        item.inputShow = false
+    hideReply(...args) {
+      if(args.length>1){
+         this.comments[args[0]].reply[args[1]].inputShow=false
+      }else{
+          this.comments[args[0]].inputShow=false
       }
+      // this.comments[i].inputShow = false
+      // for (let item of this.comments) {
+
+      //   item.inputShow = false
+      //   for (let val of item.reply) val.inputShow = false
+      // }
     },
+
     show(item) {
       // console.log(this.comments)
       // console.log(JSON.stringify(this.comments))
@@ -529,8 +594,12 @@ export default {
         this.replyShow = false
         // this.comments[i].inputShow = false
       } else {
-        this.replyShow = true
+        this.hideReplyBtn()
+
         this.comments[this.index].inputShow = false
+        for (let i of this.comments[this.index].reply) {
+          i.inputShow = false
+        }
         this.index = i
         // this.$set(this.comments[i], 'inputShow', true)
         this.comments[i].inputShow = true
@@ -546,11 +615,53 @@ export default {
         // console.log(this.comments[i])
       }
     },
-    _inputShow(i) {
+    showReplyInputs(item, i, j) {
+      // console.log(window.sessionStorage.getItem('logid'))
+      if (!this.myId) {
+        this.$message({
+          showClose: true,
+          type: 'warning',
+          message: '请先登录哦'
+        })
+
+        this.$store.commit('statusChange', true)
+        this.replyShow = false
+        // this.comments[i].inputShow = false
+      } else {
+        this.hideReplyBtn()
+        this.comments[this.index].inputShow = false
+        for (let i of this.comments[this.index].reply) {
+          i.inputShow = false
+        }
+        // this.comments[this.index].reply[j].inputShow = false
+        this.index = i
+        // this.$set(this.comments[i], 'inputShow', true)
+        this.comments[i].reply[j].inputShow = true
+        this.to = item.fromName
+        this.toId = item.fromId
+
+        this.replyed = '回复：' + item.fromName
+        let m = document.getElementsByClassName('reply-comment-input')[0]
+        if (m.innerHTML) {
+          m.innerHTML = ''
+          // m.setAttribute('placeholder', '')
+        }
+        // console.log(this.comments[i])
+      }
+    },
+    _inputShow(item, i) {
       // return !this.replyShow
+
       return this.comments[i].inputShow
     },
-    sendComment() {
+    _inputShow1(reply, i, j) {
+      // return !this.replyShow
+      if (this.comments[i].reply.includes(reply)) {
+        //  console.log(this.comments[i].reply[j])
+        return this.comments[i].reply[j].inputShow
+      }
+    },
+    sendComment(...args) {
       if (!this.replyComment) {
         this.$message({
           showClose: true,
@@ -564,6 +675,14 @@ export default {
         // let time = this.dateStr(timeNow)
         a.fromId = this.myId
         // a.from = this.myName
+        if (args.length > 0) {
+          // console.log(args)
+          a.toId = this.comments[args[0]].fromId
+          a.parentId = this.comments[args[0]]._id
+          // this.replyComment = ''
+          // document.getElementsByClassName('reply-comment-input')[args[0]].innerHTML =
+          //   ''
+        }
         // a.toId = ''
         // a.parentId = ''
         a.articleid = this.articleId
@@ -586,14 +705,14 @@ export default {
               message: res.msg
             })
             // this.comments.push(a)
-            that.replyComment = ''
+            this.replyComment = ''
             input.innerHTML = ''
             request({
               url: '/api/home/' + this.$route.params.id
             }).then(res => {
               // console.log(res)
 
-              that.comments = res.data.comment
+              this.comments = res.data.comment
             })
           })
           .catch(err => {
@@ -602,53 +721,53 @@ export default {
       }
     },
     sendCommentReply(i) {
-      if (!this.replyComment) {
-        this.$message({
-          showClose: true,
-          type: 'warning',
-          message: '评论不能为空'
-        })
-      } else {
-        let a = {}
-        let timeNow = new Date().getTime()
-        // let time = this.dateStr(timeNow)
-        a.fromId = this.myId
-        a.toId = this.comments[i].fromId
-        a.articleid = this.articleId
-        a.content = this.replyComment
+      this.sendComment(i)
+      // if (!this.replyComment) {
+      //   this.$message({
+      //     showClose: true,
+      //     type: 'warning',
+      //     message: '评论不能为空'
+      //   })
+      // } else {
+      //   let a = {}
+      //   let timeNow = new Date().getTime()
+      //   // let time = this.dateStr(timeNow)
+      //   a.fromId = this.myId
+      //   a.toId = this.comments[i].fromId
+      //   a.articleid = this.articleId
+      //   a.content = this.replyComment
 
-        a.time = timeNow
-        a.commentNum = 0
-        a.like = 0
-        a.parentId = this.comments[i]._id
-        let that = this
-        // this.comments[i].reply.push(a)
-        request({
-          method: 'post',
-          url: '/api/home/' + this.$route.params.id,
-          data: a
-        })
-          .then(res => {
-            this.$message({
-              showClose: true,
-              type: 'success',
-              message: res.msg
-            })
-            request({
-              url: '/api/home/' + this.$route.params.id
-            }).then(res => {
-              // console.log(res)
+      //   a.time = timeNow
+      //   a.commentNum = 0
+      //   a.like = 0
+      //   a.parentId = this.comments[i]._id
+      // let that = this
+      // this.comments[i].reply.push(a)
+      // request({
+      //   method: 'post',
+      //   url: '/api/home/' + this.$route.params.id,
+      //   data: a
+      // })
+      //   .then(res => {
+      //     this.$message({
+      //       showClose: true,
+      //       type: 'success',
+      //       message: res.msg
+      //     })
+      //     request({
+      //       url: '/api/home/' + this.$route.params.id
+      //     }).then(res => {
 
-              that.comments = res.data.comment
-            })
-          })
+      //       this.comments = res.data.comment
+      //     })
+      //   })
 
-          .catch(err => {
-            console.log(err)
-          })
-        this.replyComment = ''
-        document.getElementsByClassName('reply-comment-input')[i].innerHTML = ''
-      }
+      //   .catch(err => {
+      //     console.log(err)
+      //   })
+      this.replyComment = ''
+      document.getElementsByClassName('reply-comment-input')[i].innerHTML = ''
+      // }
     },
     onDivInput: function(e) {
       this.replyed = ''
@@ -795,7 +914,7 @@ export default {
       padding: 7px
     >span
       cursor: pointer
-    .iconfont
+    .iconfont el-icon-chat-dot-round
       margin: 0 5px
       .like-icon
         vertical-align: 0.02em
@@ -806,15 +925,14 @@ export default {
     .reply
       font-size: 16px
       color: #000
+    .text
+      color: #777888
+      margin: 0 6px
   .reply-box
     margin: 10px 0 0 50px
-    background-color: #efefef
     .comment-rest
-      background-color: gray
+      color: #777888
       cursor: pointer
-      text-align: center
-      &:hover
-        color: white
 .el-pagination
   text-align: center
 </style>

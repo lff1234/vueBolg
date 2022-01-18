@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const Article = require('./article_schema');
-const User = require('./user_schema');
+// const Article = require('./article_schema');
+// const User = require('./user_schema');
 const commentSchema = new mongoose.Schema({
     articleid: {
         type: mongoose.Schema.Types.ObjectId,

@@ -9,18 +9,19 @@
       >
         <div class="ai-center">
           <h2 class="flex-1">{{ blog.title }}</h2>
-          <span class="col-grey" @click="showToc()" v-show="showTocs">「 显示目录 」</span>
+          <h3 class="col-grey" @click="showToc()" v-show="showTocs">「 显示目录 」</h3>
         </div>
-        <article v-html="marked(blog.contentMd)"></article>
+
+        <article class v-html="handleDetail()"></article>
       </div>
       <div class="blog-menu .toc-sticky" v-show="!showTocs">
         <div class="ai-center">
           <h2>
             <i class="color-primary">#</i>TOC
           </h2>
-          <span class="col-grey" @click="showToc()">「 隐藏目录 」</span>
+          <h3 class="col-grey" @click="showToc()">「 隐藏目录 」</h3>
         </div>
-        <div
+        <!-- <div
           v-for="item in articleToc"
           class="menu-title cur-p text-ellipsis"
           :key="item.id"
@@ -28,7 +29,10 @@
             paddingLeft: `${item.indent}em`
           }"
           @click="scrollTo(item.id)"
-        >{{ item.text }}</div>
+        >
+          {{ item.text }}
+        </div>-->
+        <div v-html="blog.tocHtml"></div>
       </div>
     </div>
     <comment v-if="flag" :articleId="blog._id" />
@@ -40,16 +44,21 @@
 </template>
 
 <script>
-import 'github-markdown-css'
 import { request } from '../utils/network/request'
 import Comment from '../components/content/Comment'
 // import { mapState } from 'vuex'
-import marked from '../utils/marked'
+// import marked from '../utils/marked'
+import 'github-markdown-css/github-markdown.css'
+// 引入默认样式
+import 'highlight.js/scss/default.scss'
+// 引入个性化的vs2015样式
+import 'highlight.js/styles/vs2015.css'
+
 export default {
   name: 'singleblog',
   data() {
     return {
-      marked,
+      // marked,
       blogid: this.$route.params.id,
       comment: [],
       flag: false,
@@ -126,6 +135,17 @@ export default {
   //   }
   // },
   methods: {
+    handleDetail() {
+      let html = this.blog.contentHtml.split('${toc}')[0]
+      let reg = /<nav(.*?)id="toc".*?>(.*?)<\/nav>/gi
+      let arrReg = reg.exec(html)
+      if (arrReg != null) {
+        this.$set(this.blog, 'tocHtml', arrReg[0])
+        html = html.split(arrReg[0])[0]
+      }
+
+      return html
+    },
     showToc() {
       this.showTocs = !this.showTocs
     },
@@ -148,15 +168,17 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .single-blog {
   width: 90%;
   max-width: 1800px;
   margin: auto;
 }
+
 .border-right {
   border-right: 1px solid #d4d4d5;
 }
+
 @media screen and (max-width: 1090px) {
   .blog-menu {
     display: none;
@@ -168,20 +190,11 @@ export default {
     display: none;
   }
 }
-.markdown-body {
-  /* 编写容器的一些css，根据需要进行调整，这里是我博客的，在github提供的.markdown-body基础上修改的box-sizing: border-box; */
-  /* min-width: 200px; */
-  /* max-width: 980px; */
-  /* padding: 45px; */
-  /* max-width: 98%;
-  margin: 0 auto; */
-  box-shadow: 2px 4px 6px gray;
-  padding: 0 24px 16px;
-  margin-bottom: 100px;
-}
+
 .flex-1 {
   flex: 1;
 }
+
 .blog-content {
   overflow: hidden;
 }
@@ -228,9 +241,9 @@ export default {
   justify-content: space-between;
 }
 .col-grey {
-  font-size: 1rem;
+  // font-size: 1rem;
   color: #7b7b7b;
-  margin: 0 10px;
+  // margin: 0 10px;
 }
 .col-grey:hover {
   cursor: pointer;

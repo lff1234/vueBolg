@@ -4,10 +4,12 @@ const Article = require('../util/schema/article_schema');
 const Bcrypt = require('bcryptjs');
 const settoken = require('../util/token_vertify');
 const fs = require('fs');
+const md = require('../util/marked_it');
+
 /*
-生成 token
-jwt.sign() 接受两个参数，一个是传入的对象，一个是自定义的密钥
-*/
+    生成 token
+    jwt.sign() 接受两个参数，一个是传入的对象，一个是自定义的密钥
+    */
 // function jwtSignUser(user) {
 //     const ONE_WEEK = 60 * 60 * 24 * 7;
 
@@ -130,6 +132,7 @@ exports.contentGet = async(req, res) => {
                     parentComment.commentNum += 1;
                 }
             }
+
             // delete blogContent.comments;
             return res.send({
                 data: { comment: comment }
@@ -225,6 +228,8 @@ exports.addArticle = async(req, res) => {
     if (article) {
         let user = await User.findById({ _id: userId });
         article['username'] = user.username;
+        article['contentHtml'] = md.render(`${article.contentMd + '${toc}'}`);
+        // article['tocHtml'] = md.render(`${'${toc}'}`);
         return res.send({
             err: 0,
             msg: '文章发布成功',
@@ -256,6 +261,8 @@ exports.editArticle = async(req, res) => {
     if (article) {
         let user = await User.findById({ _id: article.userId });
         article['username'] = user.username;
+        article['contentHtml'] = md.render(`${article.contentMd + '${toc}'}`);
+        // article['tocHtml'] = md.render(`${'${toc}'}`);
         return res.send({
             err: 0,
             msg: '文章修改成功',

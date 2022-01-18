@@ -44,11 +44,22 @@ export default {
                 .then(response => {
                     commit('logout');
                     // localStorage.clear();
-                    sessionStorage.clear();
-                    // sessionStorage.setItem('username', null);
-                    // sessionStorage.setItem('token', '');
+                    // sessionStorage.clear();
+
+                    let arr = ['articleList', 'commentList'];
+                    // for (let i = 0, len = sessionStorage.length; i < len; i++) {
+                    //     if (!arr.includes(sessionStorage.key(i))) {
+                    //         sessionStorage.removeItem(sessionStorage.key(i));
+                    //     }
+                    // }
+                    for (let key in sessionStorage) {
+                        if (!arr.includes(key)) {
+                            sessionStorage.removeItem(key);
+                        }
+                    }
                     // sessionStorage.removeItem('logid');
                     // sessionStorage.removeItem('avator');
+                    // sessionStorage.removeItem('username');
                     // 移除之前在axios头部设置的token,现在将无法执行需要token的事务
                     delete axios.defaults.headers.common['Authorization'];
                     resolve(response);

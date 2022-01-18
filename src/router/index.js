@@ -52,7 +52,7 @@ const routes = [{
     {
         path: '/markdown',
         name: 'markdown',
-        props: { article: {} },
+        props: { article: {}, editId: '' },
         component: () =>
             import ( /* webpackChunkName: "markdown" */ '../views/Markdown.vue')
     },
@@ -114,9 +114,9 @@ const routes = [{
     {
         path: '/msgboard',
         name: 'MsgBoard',
-        meta: {
-            requiresAuth: true
-        },
+        // meta: {
+        //     requiresAuth: true
+        // },
         component: () =>
             import ('../views/MsgBoard.vue')
     }

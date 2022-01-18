@@ -11,7 +11,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
     .BundleAnalyzerPlugin;
 // 本地环境是否需要使用cdn
-const devNeedCdn = false;
+const devNeedCdn = true;
 
 // cdn链接
 const cdn = {
@@ -170,20 +170,20 @@ module.exports = {
     },
     chainWebpack(config) {
         config.entry('main').add('babel-polyfill');
+    },
+    devServer: {
+        host: 'localhost',
+        // port: 3000,
+        proxy: {
+            '/api': {
+                target: 'http://localhost:8700',
+                changeOrigin: true,
+                ws: true,
+                pathRewrite: {
+                    '^/api': '/api'
+                }
+            }
+        }
     }
-    // devServer: {
-    //     host: 'localhost',
-    //     // port: 3000,
-    //     proxy: {
-    //         '/api': {
-    //             target: 'http://localhost:8700',
-    //             changeOrigin: true,
-    //             ws: true,
-    //             pathRewrite: {
-    //                 '^/api': '/api'
-    //             }
-    //         }
-    //     }
-    // }
     // transpileDependencies: [/node_modules[/\\\\](element-ui|vuex|)[/\\\\]/]
 };

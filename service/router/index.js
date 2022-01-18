@@ -3,6 +3,8 @@ const multer = require('multer'); // 引入
 const router = express.Router();
 const services = require('../api/userApi.js');
 const Article = require('../util/schema/article_schema');
+const md = require('../util/marked_it');
+const mongoose = require('mongoose');
 // 设置图片存储路径
 let fs = require('fs');
 let storage = multer.diskStorage({
@@ -32,23 +34,34 @@ let articleUpload = multer({ storage: storage });
 const upload = multer({
     dest: 'public/myUpload/' //上传文件存放路径
 });
-router.get('/home', function(req, res, next) {
-    // console.log(req.query);
+router.post('/home', function(req, res, next) {
+    let { id, initial } = req.body;
+
+    // id = mongoose.Types.ObjectId(id);
+    if (!id) {
+        id = mongoose.Types.ObjectId();
+    }
     let tag = req.query.tag;
     if (tag) {
         Article.find({
-                tags: { $elemMatch: { $eq: tag } }
+                tags: {
+                    $elemMatch: { $eq: tag }
+                },
+                _id: { $lt: id }
             })
+            .sort({ _id: -1 })
+            .limit(20)
             .lean()
             .populate('userId')
             .then(data => {
                 // console.log(data);
-                for (let item of data) {
-                    item['username'] = item.userId.username;
-                    item['userid'] = item.userId._id;
-                    delete item.userId;
+                if (data.length > 0) {
+                    for (let item of data) {
+                        item['username'] = item.userId.username;
+                        item['userId'] = item.userId._id;
+                        // delete item.userId;
+                    }
                 }
-
                 return res.send(data);
             })
             .catch(err => {
@@ -58,18 +71,49 @@ router.get('/home', function(req, res, next) {
                 }
             });
     } else {
-        Article.find({})
+        let arr = [];
+        // arr[0] = Article.aggregate
+
+        //     .unwind('tags')
+        //     .group({
+        //         _id: '$tags',
+        //         sum: {
+        //             $sum: 1
+        //         }
+        //     })
+        arr[0] = Article.aggregate([{
+                $unwind: '$tags'
+            },
+            {
+                $group: {
+                    _id: '$tags',
+                    sum: {
+                        $sum: 1
+                    }
+                }
+            }
+        ]).then(res => {
+            // console.log(res);
+            return res;
+        });
+        arr[1] = Article.find({ _id: { $lt: id } })
+            .sort({ _id: -1 })
+            .limit(20)
             .lean()
             .populate('userId')
             .then(data => {
-                // console.log(data);
-                for (let item of data) {
-                    item['username'] = item.userId.username;
-                    item['userid'] = item.userId._id;
-                    delete item.userId;
-                }
+                if (data.length > 0) {
+                    for (let item of data) {
+                        item['username'] = item.userId.username;
+                        item['contentHtml'] = md.render(`${item.contentMd + '${toc}'}`);
 
-                return res.send(data);
+                        // console.log(md.render(`${item.contentMd + '${toc}'}`));
+                        item['userId'] = item.userId._id;
+                        // delete item.userId;
+                    }
+                }
+                // return res.send(data);
+                return data;
             })
             .catch(err => {
                 if (err) {
@@ -77,6 +121,15 @@ router.get('/home', function(req, res, next) {
                     return err;
                 }
             });
+        if (initial) {
+            Promise.all(arr).then(sum => {
+                return res.send(sum);
+            });
+        } else {
+            Promise.resolve(arr[1]).then(sum => {
+                return res.send(sum);
+            });
+        }
     }
 });
 // router.get('/myUpload/:picture', function(req, res) {

@@ -69,17 +69,17 @@
               <svg>
                 <use xlink:href="#icon-wechat" />
               </svg>
-              <span>2512066031@qq.com</span>
-            </div>
-            <div class="item">
-              <svg>
-                <use xlink:href="#icon-city" />
-              </svg>
               <span>Lff19960730</span>
             </div>
             <div class="item">
               <svg>
                 <use xlink:href="#icon-email" />
+              </svg>
+              <span>2512066031@qq.com</span>
+            </div>
+            <div class="item">
+              <svg>
+                <use xlink:href="#icon-city" />
               </svg>
               <span>深圳</span>
             </div>
@@ -280,7 +280,7 @@ export default {
   top: -70px;
   width: 100%;
 }
-@media (max-width: 768px) {
+@media screen and (max-width: 970px) {
   .myheader {
     padding-top: 20px;
     padding-bottom: 90px;

@@ -39,6 +39,16 @@ export default {
     setContent(state, item) {
         state.content = item;
     },
+    updateArticle(state, payload) {
+        let m = JSON.parse(sessionStorage.getItem('articleList'));
+        if (typeof payload.editId != 'number') {
+            m.push(payload.data);
+        } else {
+            m[payload.editId] = payload.data;
+        }
+        sessionStorage.articleList = JSON.stringify(m);
+        state.lists = JSON.stringify(m);
+    },
     timechange(state, time) {
         state.timer = time;
     },

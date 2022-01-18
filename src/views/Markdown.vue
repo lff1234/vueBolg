@@ -5,7 +5,7 @@
   </div>-->
   <div style="width:90%;margin:0 auto">
     <el-form ref="form" :model="form">
-      <el-form-item label="发布对象:">{{ username }}</el-form-item>
+      <el-form-item label="发布对象:">{{ form.username }}</el-form-item>
       <el-form-item label="文章标签:">
         <el-row>
           <el-tag
@@ -44,6 +44,8 @@
         </span>
       </el-form-item>
       <el-form-item>
+        <!-- :ishljs="true"
+        style="height: calc(100vh - 50px)"-->
         <mavon-editor
           ref="md"
           :toolbars="markDown.toolbars"
@@ -56,8 +58,8 @@
         ></mavon-editor>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" size="small" v-show="!editable" @click="submit()">发布</el-button>
-        <el-button type="primary" size="small" v-show="editable" @click="save()">保存</el-button>
+        <el-button type="primary" size="small" v-show="!editable" @click="submit('addArticle')">发布</el-button>
+        <el-button type="primary" size="small" v-show="editable" @click="submit('editArticle')">保存</el-button>
       </el-form-item>
     </el-form>
     <!-- <article v-html="myhtml"></article> -->
@@ -66,12 +68,16 @@
 
 <script>
 // import { mapState } from 'vuex'
+
 import { request } from '../utils/network/request'
 export default {
   name: 'markdown',
   props: {
     article: {
       type: Object
+    },
+    editId: {
+      type: Number
     }
   },
   data() {
@@ -116,10 +122,12 @@ export default {
       },
       editable: false,
       form: {
+        username: '',
         title: '',
         contentMd: '',
         tags: [],
-        intro: ''
+        intro: '',
+        _id: ''
       },
 
       inputVisible: false,
@@ -135,8 +143,20 @@ export default {
   },
   mounted() {
     if (this.article) {
+      // console.log(!this.article)
       this.form = this.article
       this.editable = true
+    } else {
+      this.form.username = this.username
+    }
+    // console.log(this.editId)
+    // console.log(this.article)
+  },
+  watch: {
+    username: function(newVal, oldVal) {
+      if (newVal != this.form.username) {
+        this.$router.push({ path: '/home' })
+      }
     }
   },
   methods: {
@@ -173,49 +193,53 @@ export default {
       // this.form.contentHtml = render
     },
     //保存修改并提交
-    save() {
+    // save() {
+    //   let date = new Date()
+    //   request({
+    //     url: '/api/editArticle',
+    //     method: 'post',
+    //     data: {
+    //       editUpdate: date,
+    //       id: this.form._id,
+    //       title: this.form.title,
+    //       tags: this.form.tags,
+    //       intro: this.form.intro,
+    //       contentMd: this.form.contentMd
+    //     }
+    //   })
+    //     .then(res => {
+    //       if (res.err == 0) {
+    //         this.$message({
+    //           showClose: true,
+    //           type: 'success',
+    //           message: res.msg
+    //         })
+    //         let data = res.data
+    //         let editId = this.editId
+    //         this.$store.commit('updateArticle', { data, editId })
+    //         this.$router.push({ path: '/home' })
+    //       } else {
+    //         this.$message({
+    //           showClose: true,
+    //           type: 'warning',
+    //           message: res.msg
+    //         })
+    //       }
+    //     })
+    //     .catch(err => {
+    //       console.log(err)
+    //     })
+    // },
+    // 提交
+    submit(arg) {
       let date = new Date()
+
       request({
-        url: '/api/editArticle',
+        url: '/api/' + arg,
         method: 'post',
         data: {
           editUpdate: date,
           id: this.form._id,
-          title: this.form.title,
-          tags: this.form.tags,
-          intro: this.form.intro,
-          contentMd: this.form.contentMd
-        }
-      })
-        .then(res => {
-          if (res.err == 0) {
-            this.$message({
-              showClose: true,
-              type: 'success',
-              message: res.msg
-            })
-            this.$router.push({ path: '/home' })
-          } else {
-            this.$message({
-              showClose: true,
-              type: 'warning',
-              message: res.msg
-            })
-          }
-        })
-        .catch(err => {
-          console.log(err)
-        })
-    },
-    // 提交
-    submit() {
-      let date = new Date()
-
-      request({
-        url: '/api/addArticle',
-        method: 'post',
-        data: {
-          editUpdate: date,
           userId: this.userId,
           title: this.form.title,
           tags: this.form.tags,
@@ -230,8 +254,11 @@ export default {
               type: 'success',
               message: res.msg
             })
+            let data = res.data
+            let editId = this.editId
+            this.$store.commit('updateArticle', { data, editId })
             this.$router.push({ path: '/home' })
-            this.$route.matched[0].props.default.newArticle = res.data
+            // this.$route.matched[0].props.default.newArticle = res.data
           } else {
             this.$message({
               showClose: true,

@@ -5,7 +5,7 @@ module.exports = () => {
     mongoose.connect(config.mongodb, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
-        useFindAndModify: true
+        useFindAndModify: false
     });
     const db = mongoose.connection;
     db.on('error', console.error.bind(console, '连接错误'));
