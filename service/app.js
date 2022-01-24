@@ -46,7 +46,7 @@ app.use(
         algorithms: ['HS256']
     }).unless({
         path: [
-                { url: /^\/api\/home(\/\d{1,})?/, methods: ['GET'] },
+                { url: /^\/api\/home\/\d{1,}/, methods: ['GET'] },
                 { url: '/api/dianzan', methods: ['GET'] },
                 {
                     url: /^\/api\/public\/myUpload(\/.+){0,}?/,

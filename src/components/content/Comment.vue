@@ -17,7 +17,7 @@
           class="reply-input"
           @focus="showReplyBtn"
           @input="onDivInput($event)"
-          v-clickoutside="hideReplyBtn"
+          v-clickoutside="hideReplyBtn.bind(this)"
         ></div>
       </div>
       <div class="reply-btn-box" v-show="btnShow">
@@ -215,6 +215,7 @@
       </div>
     </div>-->
     <el-pagination
+      v-if="comments.length>5"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="currentPage"
@@ -422,10 +423,10 @@ export default {
       // console.log(this.currentPage) //点击第几页
     },
     hideReply(...args) {
-      if(args.length>1){
-         this.comments[args[0]].reply[args[1]].inputShow=false
-      }else{
-          this.comments[args[0]].inputShow=false
+      if (args.length > 1) {
+        this.comments[args[0]].reply[args[1]].inputShow = false
+      } else {
+        this.comments[args[0]].inputShow = false
       }
       // this.comments[i].inputShow = false
       // for (let item of this.comments) {
@@ -576,7 +577,7 @@ export default {
       this.btnShow = true
     },
     hideReplyBtn() {
-      // console.log(e)
+      let replyInput = document.getElementById('replyInput')
       this.btnShow = false
       replyInput.style.padding = '10px'
       replyInput.style.border = 'none'

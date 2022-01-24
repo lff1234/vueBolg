@@ -13,6 +13,7 @@
         </div>
 
         <article class v-html="handleDetail()"></article>
+        <!-- <article class v-html="blog.contentHtml"></article> -->
       </div>
       <div class="blog-menu .toc-sticky" v-show="!showTocs">
         <div class="ai-center">
@@ -53,17 +54,21 @@ import 'github-markdown-css/github-markdown.css'
 import 'highlight.js/scss/default.scss'
 // 引入个性化的vs2015样式
 import 'highlight.js/styles/vs2015.css'
-
+// let handle = () => {
+//   console.log('hh')
+//   sessionStorage.setItem('store', JSON.stringify(this.$store.state))
+// }
 export default {
   name: 'singleblog',
   data() {
     return {
       // marked,
+      // blog: {},
       blogid: this.$route.params.id,
       comment: [],
       flag: false,
       showTocs: false,
-      articleToc: [],
+      // articleToc: [],
       alwaysShow: true
     }
   },
@@ -71,6 +76,11 @@ export default {
     Comment
   },
   created() {
+    // sessionStorage.removeItem('commentList')
+    // sessionStorage.setItem(
+    //   this.$route.params.id,
+    //   JSON.stringify(this.$store.state.content)
+    // )
     if (sessionStorage.getItem('store')) {
       this.$store.replaceState(
         Object.assign(
@@ -80,6 +90,7 @@ export default {
         )
       )
     }
+
     // if (sessionStorage.getItem(this.$route.params.id)) {
     //   // this.comments = JSON.parse(sessionStorage.getItem(this.$route.params.id))
     //   this.$store.state.content = this.articleComment
@@ -106,16 +117,14 @@ export default {
       blog: state => state.content
     })
   },
+  beforeRouteLeave(to, from, next) {
+    window.removeEventListener('beforeunload', this.handle())
+    sessionStorage.removeItem('store')
+    next()
+  },
   mounted() {
-    this.init()
-    window.onbeforeunload = () => {
-      sessionStorage.setItem('store', JSON.stringify(this.$store.state))
-      // sessionStorage.removeItem('commentList')
-      // sessionStorage.setItem(
-      //   this.$route.params.id,
-      //   JSON.stringify(this.$store.state.content)
-      // )
-    }
+    window.addEventListener('beforeunload', this.handle())
+    // this.init()
   },
   // watch: {
   //   $route(to, from) {
@@ -135,6 +144,9 @@ export default {
   //   }
   // },
   methods: {
+    handle() {
+      sessionStorage.setItem('store', JSON.stringify(this.$store.state))
+    },
     handleDetail() {
       let html = this.blog.contentHtml.split('${toc}')[0]
       let reg = /<nav(.*?)id="toc".*?>(.*?)<\/nav>/gi
@@ -148,22 +160,22 @@ export default {
     },
     showToc() {
       this.showTocs = !this.showTocs
-    },
-    init() {
-      this.articleToc = this.blog.toc
-    },
-    scrollTo(id) {
-      // 绑定 toc 点击事件
-      let node = document.querySelector('[data-id="' + id + '"]')
-      if (!node) {
-        return
-      }
-      node.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'nearest'
-      })
     }
+    // init() {
+    //   this.articleToc = this.blog.toc
+    // },
+    // scrollTo(id) {
+    //   // 绑定 toc 点击事件
+    //   let node = document.querySelector('[data-id="' + id + '"]')
+    //   if (!node) {
+    //     return
+    //   }
+    //   node.scrollIntoView({
+    //     behavior: 'smooth',
+    //     block: 'center',
+    //     inline: 'nearest'
+    //   })
+    // }
   }
 }
 </script>

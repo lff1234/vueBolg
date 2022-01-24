@@ -162,7 +162,7 @@ export default {
       // console.log(this.tagLists.tagContents)
       let tag = this.$route.query.tag
       let index = this.tagLists.tags.indexOf(tag)
-      switchTag(tag, index)
+      this.switchTag(tag, index)
       // console.log(tagArr)
     } else {
       if (!this.list.length) {
@@ -325,7 +325,8 @@ export default {
               url: '/api/home',
               method: 'post',
               data: {
-                id: allArr[allArr.length - 1]._id
+                id: allArr[allArr.length - 1]._id,
+                initial: false
               }
             })
               .then(data => {
@@ -399,8 +400,8 @@ export default {
       // let tocData = buildToc(item.contentMd)
       // this.$set(item, 'toc', tocData.toc)
       // item.contentMd = tocData.article
+      // sessionStorage.setItem(''+index+1,item.contentMd)
       this.$store.commit('setContent', item)
-      // console.log(item.contentHtml);
     },
     switchTag(tag, index) {
       // let query = {}
@@ -466,22 +467,22 @@ export default {
   computed: {
     // ...mapState({
     ...Vuex.mapState({
-      // articlelist: state => state.lists,
+      // list: state => state.lists,
       userId: state => state.logId
     }),
-    articlelist() {
-      let m = this.$store.state.lists
-      // console.log(m instanceof Array)
-      if (m instanceof Array) {
-        return this.list
-      } else {
-        return JSON.parse(m)
-      }
-    },
+    // articlelist() {
+    //   let m = this.$store.state.lists
+    //   // console.log(m instanceof Array)
+    //   if (m instanceof Array) {
+    //     return m
+    //   } else {
+    //     return JSON.parse(m)
+    //   }
+    // },
     filterArtical: function() {
       let searchStrings = this.searchString.trim()
       let tag = this.$route.query.tag
-      let article = tag ? this.tagLists.tagContents[tag] : this.articlelist
+      let article = tag ? this.tagLists.tagContents[tag] : this.list
       // console.log(article)
       if (!searchStrings) {
         return article

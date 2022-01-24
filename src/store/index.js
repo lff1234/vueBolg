@@ -12,9 +12,9 @@ const state = {
     logId: sessionStorage.getItem('logid') || '',
     token: sessionStorage.getItem('token') || '',
     commentList: sessionStorage.getItem('commentList') || [],
-    lists: sessionStorage.getItem('articleList') || [],
-    avator: '' || '/api/' + sessionStorage.getItem('avator'),
-    originalAvator: '' || sessionStorage.getItem('originalAvator'),
+    // lists: sessionStorage.getItem('articleList') || [],
+    avator: '/api/' + sessionStorage.getItem('avator') || '',
+    originalAvator: sessionStorage.getItem('originalAvator') || '',
     timer: null,
     usrCard: {}
 };

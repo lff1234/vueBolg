@@ -11,7 +11,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
     .BundleAnalyzerPlugin;
 // 本地环境是否需要使用cdn
-const devNeedCdn = true;
+const devNeedCdn = false;
 
 // cdn链接
 const cdn = {
@@ -101,38 +101,38 @@ module.exports = {
                 })
             );
             //公共代码抽离;
-            // config.optimization = {
-            //     splitChunks: {
-            //         cacheGroups: {
-            //             vendor: {
-            //                 chunks: 'all',
-            //                 test: /node_modules/,
-            //                 name: 'vendor',
-            //                 minChunks: 1,
-            //                 maxInitialRequests: 5,
-            //                 minSize: 0,
-            //                 priority: 100
-            //             },
-            //             common: {
-            //                 chunks: 'all',
-            //                 test: /[\\/]src[\\/]js[\\/]/,
-            //                 name: 'common',
-            //                 minChunks: 2,
-            //                 maxInitialRequests: 5,
-            //                 minSize: 0,
-            //                 priority: 60
-            //             },
-            //             styles: {
-            //                 name: 'styles',
-            //                 test: /\.(sa|sc|c)ss$/,
-            //                 chunks: 'all',
-            //                 enforce: true
-            //             },
-            //             runtimeChunk: {
-            //                 name: 'manifest'
+            //     config.optimization = {
+            //         splitChunks: {
+            //             cacheGroups: {
+            //                 vendor: {
+            //                     chunks: 'all',
+            //                     test: /node_modules/,
+            //                     name: 'vendor',
+            //                     minChunks: 1,
+            //                     maxInitialRequests: 5,
+            //                     minSize: 0,
+            //                     priority: 100
+            //                 },
+            //                 common: {
+            //                     chunks: 'all',
+            //                     test: /[\\/]src[\\/]js[\\/]/,
+            //                     name: 'common',
+            //                     minChunks: 2,
+            //                     maxInitialRequests: 5,
+            //                     minSize: 0,
+            //                     priority: 60
+            //                 },
+            //                 styles: {
+            //                     name: 'styles',
+            //                     test: /\.(sa|sc|c)ss$/,
+            //                     chunks: 'all',
+            //                     enforce: true
+            //                 },
+            //                 runtimeChunk: {
+            //                     name: 'manifest'
+            //                 }
             //             }
             //         }
-            //     }
             // };
         }
     },
@@ -170,20 +170,20 @@ module.exports = {
     },
     chainWebpack(config) {
         config.entry('main').add('babel-polyfill');
-    },
-    devServer: {
-        host: 'localhost',
-        // port: 3000,
-        proxy: {
-            '/api': {
-                target: 'http://localhost:8700',
-                changeOrigin: true,
-                ws: true,
-                pathRewrite: {
-                    '^/api': '/api'
-                }
-            }
-        }
     }
+    // devServer: {
+    //     host: 'localhost',
+    //     // port: 3000,
+    //     proxy: {
+    //         '/api': {
+    //             target: 'http://localhost:8700',
+    //             changeOrigin: true,
+    //             ws: true,
+    //             pathRewrite: {
+    //                 '^/api': '/api'
+    //             }
+    //         }
+    //     }
+    // }
     // transpileDependencies: [/node_modules[/\\\\](element-ui|vuex|)[/\\\\]/]
 };
