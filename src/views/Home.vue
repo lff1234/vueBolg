@@ -616,7 +616,7 @@ ul {
 // }
 .item-action {
   display: flex;
-  // justify-content: space-between;
+  justify-content: space-between;
   // align-items: center;
 }
 .edit-color {

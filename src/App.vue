@@ -3,7 +3,7 @@
     <el-header>
       <div class="nav">
         <div class="maintab">
-          <img src="./assets/images/show3.png" width="54px" height="55px" />
+          <img src="./assets/images/show3.png" width="54px" height="60px" />
         </div>
         <div :class="[{ 'nav-slidedown': isActive }, staticClass]">
           <button type="button" class="nav-more-btn" @click="slideDown()">
@@ -114,12 +114,15 @@
         @mouseout="hideInfo()"
       >
         <div class="info-div clearfix">
-          <dt class="touxiang">
-            <el-avatar :size="56" :src="options.avatar"></el-avatar>
-          </dt>
+          <!-- <dt class="touxiang"> -->
+          <el-avatar class="touxiang" :size="56" :src="options.avatar"></el-avatar>
+          <!-- </dt> -->
           <div class="left-info">
-            <dd class="person-info">{{ options.username }}</dd>
-            <dd>个性签名:{{ options.signature }}</dd>
+            <!-- <dd class="person-info">{{ options.username }}</dd>
+            <dd>个性签名:{{ options.signature }}</dd>-->
+            <span class="person-info">{{ options.username }}</span>
+            <br />
+            <span>个性签名:{{ options.signature }}</span>
           </div>
         </div>
         <div class="follow-div clearfix">
@@ -376,41 +379,47 @@ a:visited {
   margin-bottom: 0;
   display: inline-block;
 }
-.touxiang {
+.info-div .touxiang {
   float: left;
 }
-.left-info {
-  float: left;
-}
+
 .clearfix::after {
   display: block;
   content: '';
   clear: both;
 }
-
+.list {
+  height: 60px;
+}
 .list li {
   list-style: none;
   float: left;
   margin-right: 30px;
 }
 
-ul::after {
+/* ul::after {
   content: '';
   display: block;
   clear: both;
-}
+} */
 
 .list li a {
-  border-radius: 0.5em;
+  /* height: 50px;
+  line-height: 50px; */
 
+  display: block;
+
+  line-height: 58px;
   color: white;
   text-align: center;
-  padding: 16px;
+  padding: 0 8px;
   text-decoration: none;
 }
 
-li a:hover {
-  background-color: #888;
+.list li a:hover {
+  color: blanchedalmond;
+  border-bottom: 2px solid blanchedalmond;
+  /* background-color: #888; */
 }
 @media screen and (max-width: 1150px) {
   .userHome {
@@ -446,7 +455,7 @@ li a:hover {
     right: 10px;
     width: 200px;
     background-color: transparent;
-    /* box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1), 1px 1px 2px rgba(0, 0, 0, 0.2); */
+
     visibility: hidden;
     opacity: 0;
   }
@@ -459,6 +468,7 @@ li a:hover {
     display: inline-block;
     width: 100%;
     text-align: center;
+    border-radius: 0.5em;
     border: 1px solid gold;
     color: #444;
     background-color: #fff;
@@ -494,7 +504,7 @@ li a:hover {
   .list .list-body a:hover {
     background-color: #444;
     color: #fff;
-    /* text-decoration: underline; */
+    border-bottom: 1px solid #409eff;
   }
   .nav-slidedown .list-body {
     visibility: visible;
@@ -526,13 +536,14 @@ li a:hover {
   /* object-fit: cover; */
 }
 
-/* .maintab {
-  margin-left: 30px;
-} */
+.maintab {
+  height: 60px;
+  /* margin-left: 30px; */
+}
 
 .el-header {
   /* min-width: 1032px; */
-  padding: 0.7rem 1.5rem;
+  /* padding: 0.7rem 1.5rem; */
   line-height: 2.2rem;
   position: fixed;
   height: 2.2rem;

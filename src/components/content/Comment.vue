@@ -175,18 +175,18 @@
               >发表评论</el-button>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div class="comment-rest" v-if="item.reply.length > 3">
-        <span v-if="pullDown" @click.stop="setPullDown(false)">
-          显示全部{{ item.reply.length }}条
-          <i class="el-icon-arrow-down"></i>
-        </span>
-        <span v-else @click.stop="setPullDown(true)">
-          收起评论
-          <i class="el-icon-arrow-up"></i>
-        </span>
+        </div>
+        <div class="comment-rest" v-if="item.reply.length > 3">
+            <span v-if="pullDown" @click.stop="setPullDown(false)">
+              显示全部{{ item.reply.length }}条
+              <i class="el-icon-arrow-down"></i>
+            </span>
+            <span v-else @click.stop="setPullDown(true)">
+              收起评论
+              <i class="el-icon-arrow-up"></i>
+            </span>
+          </div>
       </div>
     </div>
 
@@ -408,7 +408,7 @@ export default {
 
       let timer = setTimeout(() => {
         this.hide()
-      }, 1000)
+      }, 500)
       this.$store.commit('timechange', timer)
     },
     hide() {
@@ -934,6 +934,8 @@ export default {
     .comment-rest
       color: #777888
       cursor: pointer
+      span
+         padding-left: 10px
 .el-pagination
   text-align: center
 </style>

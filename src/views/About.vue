@@ -21,10 +21,10 @@
               <span>工作经验</span>
               <span>1年</span>
             </div>
-            <div class="item">
+            <!-- <div class="item">
               <span>意向薪资</span>
               <span>8~10k</span>
-            </div>
+            </div>-->
           </div>
         </section>
         <section>
