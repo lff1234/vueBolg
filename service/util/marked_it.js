@@ -52,17 +52,18 @@ const md = new MarkdownIt({
             return '<pre class="hljs"><code>' + html + '</code></pre>';
         }
     })
-    .use(anchor, {
-        permalink: anchor.permalink.ariaHidden({
-                placement: 'before'
-            })
-            // permalink: anchor.permalink.linkAfterHeader({
-            //     style: 'visually-hidden',
-            //     assistiveText: title => `"${title}"`,
-            //     visuallyHiddenClass: 'visually-hidden',
-            //     placement: 'before'
-            // })
-    })
+    // .use(anchor, {
+    //     permalink: anchor.permalink.ariaHidden({
+    //             placement: 'before'
+    //         })
+    //         // permalink: anchor.permalink.linkAfterHeader({
+    //         //     style: 'visually-hidden',
+    //         //     assistiveText: title => `"${title}"`,
+    //         //     visuallyHiddenClass: 'visually-hidden',
+    //         //     placement: 'before'
+    //         // })
+    // })
+    .use(anchor)
     .use(require('markdown-it-toc-done-right'), {
         containerClass: 'toc', //生成的容器的类名，这样最后返回来的字符串是 <nav class="toc"><nav/>
         containerId: 'toc', //生成的容器的ID，这样最后返回来的字符串是 <nav id="toc"><nav/>
@@ -70,10 +71,10 @@ const md = new MarkdownIt({
         listClass: 'listClass', //li标签的样式名
         linkClass: 'linkClass', //a标签的样式名
         callback: function(html, ast) {
+            // return html;
             //把目录单独列出来
+            // console.log(html);
             // html = 'split' + html + 'split';
         }
     });
-
-// console.log(module.exports);
 module.exports = md;

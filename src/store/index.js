@@ -6,14 +6,14 @@ import getters from './getters';
 Vue.use(Vuex);
 
 const state = {
-    content: '',
+    content: sessionStorage.getItem('content') || '',
     currentUser: sessionStorage.getItem('username') || '',
     status: false,
     logId: sessionStorage.getItem('logid') || '',
     token: sessionStorage.getItem('token') || '',
-    commentList: sessionStorage.getItem('commentList') || [],
+    commentList: [],
     // lists: sessionStorage.getItem('articleList') || [],
-    avator: '/api/' + sessionStorage.getItem('avator') || '',
+    avator: sessionStorage.getItem('avator') || '',
     originalAvator: sessionStorage.getItem('originalAvator') || '',
     timer: null,
     usrCard: {}

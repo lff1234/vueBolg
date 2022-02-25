@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+// import {createRouter} from 'vue-router';
 import Home from '../views/Home.vue';
 import store from '../store/index';
 if (!window.VueRouter) Vue.use(VueRouter);
@@ -122,6 +123,10 @@ const routes = [{
     }
 ];
 
+// const router =createRouter({
+//   history:createWebHistory(),
+//   routes
+// })
 const router = new VueRouter({
     mode: 'history',
     linkActiveClass: 'active',

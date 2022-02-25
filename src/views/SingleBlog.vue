@@ -36,7 +36,7 @@
         <div v-html="blog.tocHtml"></div>
       </div>
     </div>
-    <comment v-if="flag" :articleId="blog._id" />
+    <comment v-if="flag" :articleId="blog._id" :id="blog.id" />
     <!-- <div id="msg-box" v-if="infoShow" class="infoShow" :style="{ top: floatTop, left: floatLeft}">
       <div class="innerDiv"></div>
       <p>hi</p>
@@ -58,29 +58,35 @@ import 'highlight.js/styles/vs2015.css'
 //   console.log('hh')
 //   sessionStorage.setItem('store', JSON.stringify(this.$store.state))
 // }
+window.addEventListener('hashchange', () => {
+  let hash = location.hash
+
+  console.log(hash)
+
+  let id = '_' + hash.split('#')[1]
+  let el = document.getElementById(id)
+  el.scrollIntoView()
+})
 export default {
   name: 'singleblog',
   data() {
     return {
       // marked,
       // blog: {},
-      blogid: this.$route.params.id,
-      comment: [],
+      // blogid: this.$route.params.id,
+      // comment: [],
       flag: false,
       showTocs: false,
       // articleToc: [],
       alwaysShow: true
+      // hash: window.location.hash
     }
   },
   components: {
     Comment
   },
   created() {
-    // sessionStorage.removeItem('commentList')
-    // sessionStorage.setItem(
-    //   this.$route.params.id,
-    //   JSON.stringify(this.$store.state.content)
-    // )
+    //在页面加载时读取sessionStorage里的状态信息
     if (sessionStorage.getItem('store')) {
       this.$store.replaceState(
         Object.assign(
@@ -90,6 +96,10 @@ export default {
         )
       )
     }
+    //在页面刷新时将vuex里的信息保存到sessionStorage里
+    window.addEventListener('beforeunload', () => {
+      sessionStorage.setItem('store', JSON.stringify(this.$store.state))
+    })
 
     // if (sessionStorage.getItem(this.$route.params.id)) {
     //   // this.comments = JSON.parse(sessionStorage.getItem(this.$route.params.id))
@@ -98,10 +108,10 @@ export default {
     // }
 
     request({
-      url: '/api/home/' + this.blogid
+      url: '/api/home/' + this.blog.id + '?timestamp=' + new Date().getTime()
     })
       .then(res => {
-        this.comment = res.data.comment
+        // this.comment = res.data.comment
         // console.log(this.comment)
         this.$store.commit('UpdateCommentList', res.data.comment)
         // console.log(this.$store.state.commentList)
@@ -111,6 +121,7 @@ export default {
         console.log(err)
       })
   },
+
   computed: {
     // ...mapState({
     ...Vuex.mapState({
@@ -118,14 +129,15 @@ export default {
     })
   },
   beforeRouteLeave(to, from, next) {
-    window.removeEventListener('beforeunload', this.handle())
+    // window.removeEventListener('beforeunload', this.handle())
     sessionStorage.removeItem('store')
     next()
   },
   mounted() {
-    window.addEventListener('beforeunload', this.handle())
+    // window.addEventListener('beforeunload', this.handle())
     // this.init()
   },
+
   // watch: {
   //   $route(to, from) {
   //     if (to.params.id != from.params.id) {
@@ -144,18 +156,19 @@ export default {
   //   }
   // },
   methods: {
-    handle() {
-      sessionStorage.setItem('store', JSON.stringify(this.$store.state))
-    },
     handleDetail() {
-      let html = this.blog.contentHtml.split('${toc}')[0]
+      let html = this.blog.contentHtml
       let reg = /<nav(.*?)id="toc".*?>(.*?)<\/nav>/gi
       let arrReg = reg.exec(html)
       if (arrReg != null) {
         this.$set(this.blog, 'tocHtml', arrReg[0])
+        // html = html.split(arrReg[0])[0]
         html = html.split(arrReg[0])[0]
+        html = html.replace(/id="(.*)"/g, `id="_$1"`)
       }
-
+      // else {
+      //   html = html.split('${toc}')[0]
+      // }
       return html
     },
     showToc() {

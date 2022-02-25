@@ -202,7 +202,7 @@ export default {
                 nums.push(item.sum)
               }
             })
-
+            sessionStorage.setItem('articleList', JSON.stringify(this.list))
             // this.articlelist.forEach((val, i, arr) => {
             //   this.tagLists.tags.forEach((item, index) => {
             //     if (val.tags.includes(item)) {
@@ -401,7 +401,9 @@ export default {
       // this.$set(item, 'toc', tocData.toc)
       // item.contentMd = tocData.article
       // sessionStorage.setItem(''+index+1,item.contentMd)
+
       this.$store.commit('setContent', item)
+      sessionStorage.setItem('content', JSON.stringify(item))
     },
     switchTag(tag, index) {
       // let query = {}

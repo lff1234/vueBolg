@@ -15,6 +15,8 @@
           spellcheck="false"
           placeholder="输入评论..."
           class="reply-input"
+          @keyup="getContent($event)"
+          @keypress="delTishi"
           @focus="showReplyBtn"
           @input="onDivInput($event)"
           v-clickoutside="hideReplyBtn.bind(this)"
@@ -87,6 +89,8 @@
             spellcheck="false"
             :placeholder="replyed"
             @input="onDivInput($event)"
+            @keyup="getContent($event)"
+            @keypress="delTishi"
             class="reply-input reply-comment-input"
             v-focus="comments[i].inputShow"
             v-clickoutside="hideReply.bind(this,i)"
@@ -161,6 +165,8 @@
                 spellcheck="false"
                 :placeholder="replyed"
                 @input="onDivInput($event)"
+                @keyup="getContent($event)"
+                @keypress="delTishi"
                 class="reply-input reply-comment-input"
                 v-focus="comments[i].reply[j].inputShow"
                 v-clickoutside="hideReply.bind(this,i,j)"
@@ -175,18 +181,17 @@
               >发表评论</el-button>
             </div>
           </div>
-
         </div>
         <div class="comment-rest" v-if="item.reply.length > 3">
-            <span v-if="pullDown" @click.stop="setPullDown(false)">
-              显示全部{{ item.reply.length }}条
-              <i class="el-icon-arrow-down"></i>
-            </span>
-            <span v-else @click.stop="setPullDown(true)">
-              收起评论
-              <i class="el-icon-arrow-up"></i>
-            </span>
-          </div>
+          <span v-if="pullDown" @click.stop="setPullDown(false)">
+            显示全部{{ item.reply.length }}条
+            <i class="el-icon-arrow-down"></i>
+          </span>
+          <span v-else @click.stop="setPullDown(true)">
+            收起评论
+            <i class="el-icon-arrow-up"></i>
+          </span>
+        </div>
       </div>
     </div>
 
@@ -195,7 +200,7 @@
         <div class="reply-info">
           <div
             tabindex="0"
-            contenteditable="true"
+            contentEditable="true"
             spellcheck="false"
             :placeholder="replyed"
             @input="onDivInput($event)"
@@ -230,6 +235,8 @@
 <script>
 import { request } from '../../utils/network/request'
 // import { mapState } from 'vuex';
+
+let editArr = document.getElementsByClassName('contenteditable')
 const clickoutside = {
   // 初始化指令
   bind(el, binding, vnode) {
@@ -267,15 +274,21 @@ export default {
   // inject: ['reload'],
   name: 'comment',
   props: {
-    articleComment: {
-      type: Array
-    },
+    // articleComment: {
+    //   type: Array
+    // },
     articleId: {
       type: String
+    },
+    id: {
+      type: Number
     }
   },
   // mounted() {
   //   console.log(JSON.stringify(this.comments))
+  // },
+  // created(){
+  //   this.comments=this.$store.state.commentList
   // },
   data() {
     return {
@@ -290,7 +303,7 @@ export default {
       to: '',
       toId: -1,
       pullDown: true,
-      comments: this.$store.state.commentList,
+      // comments: this.$store.state.commentList,
       avatarHeight: ''
 
       // fits: 'contain'
@@ -301,7 +314,8 @@ export default {
     ...Vuex.mapState({
       myHeader: state => state.avator,
       myId: state => state.logId,
-      timer: state => state.timer
+      timer: state => state.timer,
+      comments: state => state.commentList
     })
   },
   directives: {
@@ -576,6 +590,13 @@ export default {
     showReplyBtn() {
       this.btnShow = true
     },
+    getContent(e) {
+      console.log(e.target.innerHTML)
+      this.replyComment = e.target.innerHTML
+    },
+    delTishi() {
+      this.replyed = ''
+    },
     hideReplyBtn() {
       let replyInput = document.getElementById('replyInput')
       this.btnShow = false
@@ -663,6 +684,7 @@ export default {
       }
     },
     sendComment(...args) {
+      // this.replyComment = document.getElementsByClassName
       if (!this.replyComment) {
         this.$message({
           showClose: true,
@@ -676,7 +698,8 @@ export default {
         // let time = this.dateStr(timeNow)
         a.fromId = this.myId
         // a.from = this.myName
-        if (args.length > 0) {
+        // console.log(typeof args[0])
+        if (typeof args[0] == 'number') {
           // console.log(args)
           a.toId = this.comments[args[0]].fromId
           a.parentId = this.comments[args[0]]._id
@@ -684,8 +707,7 @@ export default {
           // document.getElementsByClassName('reply-comment-input')[args[0]].innerHTML =
           //   ''
         }
-        // a.toId = ''
-        // a.parentId = ''
+
         a.articleid = this.articleId
         a.content = this.replyComment
 
@@ -705,15 +727,24 @@ export default {
               type: 'success',
               message: res.msg
             })
-            // this.comments.push(a)
+            // if (args[2] && args[2] == 'reply') {
+            //   this.comments[args[0]].reply.push(res.data)
+            // } else {
+            //   this.comments.push(res.data)
+            // }
+
             this.replyComment = ''
             input.innerHTML = ''
+            this.hideReplyBtn()
+            // console.log(this.id)
             request({
-              url: '/api/home/' + this.$route.params.id
+              url: '/api/home/' + this.id + '?timestamp=' + new Date().getTime()
             }).then(res => {
-              // console.log(res)
-
-              this.comments = res.data.comment
+              this.$store.commit('UpdateCommentList', res.data.comment)
+              // sessionStorage.commentList = res.data.comment
+              // this.$set(this.comments, res.data.comment)
+              // this.comments.splice(0,this.comments.length,res.data.comment)
+              // console.log(this.comments)
             })
           })
           .catch(err => {
@@ -722,7 +753,7 @@ export default {
       }
     },
     sendCommentReply(i) {
-      this.sendComment(i)
+      this.sendComment(i, 'reply')
       // if (!this.replyComment) {
       //   this.$message({
       //     showClose: true,
@@ -771,13 +802,12 @@ export default {
       // }
     },
     onDivInput: function(e) {
-      this.replyed = ''
       // let m = document.defaultView.getComputedStyle(e.target, ':before')
-      // console.log(e.target.innerHTML)
       // if (e.target.innerHTML) {
       //   e.target.setAttribute('placeholder', '')
       // }
-
+      // console.log(e.target.innerHTML)
+      this.replyed = ''
       this.replyComment = e.target.innerHTML
       // console.log(m.content)
       // e.cancelBubble = true
@@ -935,7 +965,7 @@ export default {
       color: #777888
       cursor: pointer
       span
-         padding-left: 10px
+        padding-left: 10px
 .el-pagination
   text-align: center
 </style>

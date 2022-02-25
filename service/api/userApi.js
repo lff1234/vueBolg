@@ -40,7 +40,7 @@ exports.articleImgUpload = async(req, res) => {
 };
 
 exports.imgUpload = async(req, res) => {
-    console.log(req.file);
+    // console.log(req.file);
     // console.log(req.body);
     let file = req.file;
     let imgName =
@@ -228,8 +228,10 @@ exports.addArticle = async(req, res) => {
     if (article) {
         let user = await User.findById({ _id: userId });
         article['username'] = user.username;
-        article['contentHtml'] = md.render(`${article.contentMd + '${toc}'}`);
+        article['contentHtml'] = md.render(`${article.contentMd + '\n${toc}'}`);
+
         // article['tocHtml'] = md.render(`${'${toc}'}`);
+        console.log(article['contentHtml']);
         return res.send({
             err: 0,
             msg: '文章发布成功',
@@ -261,7 +263,9 @@ exports.editArticle = async(req, res) => {
     if (article) {
         let user = await User.findById({ _id: article.userId });
         article['username'] = user.username;
-        article['contentHtml'] = md.render(`${article.contentMd + '${toc}'}`);
+        article['contentHtml'] = md.render(`${article.contentMd + '\n${toc}'}`);
+        // article['contentHtml'] = md.render(`${article.contentMd + '[toc]'}`);
+        console.log(typeof contentMd);
         // article['tocHtml'] = md.render(`${'${toc}'}`);
         return res.send({
             err: 0,

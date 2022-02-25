@@ -32,7 +32,7 @@
         </div>
 
         <div class="search-box">
-          <input class="search-box_ins" placeholder="请搜索..." v-model="content" />
+          <input class="search-box_ins" placeholder="请搜索..." v-model="content" autocomplete="off" />
           <i class="icon" @click="searchArticle()">
             <svg
               class="Zi Zi--Search SearchBar-searchIcon"
@@ -605,15 +605,18 @@ a:visited {
   align-items: center;
   margin-right: 15px;
 }
-
-.search-box input {
+input::-ms-clear {
+  display: none;
+}
+.search-box_ins {
   /* width: 100px; */
   margin-left: 100px;
-  flex: 1;
+  /* flex: 1; */
   height: 30px;
   line-height: 30px;
   border-radius: 6px;
   color: black;
+
   /* background-color: #ccc; */
 }
 

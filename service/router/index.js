@@ -105,7 +105,7 @@ router.post('/home', function(req, res, next) {
                 if (data.length > 0) {
                     for (let item of data) {
                         item['username'] = item.userId.username;
-                        item['contentHtml'] = md.render(`${item.contentMd + '${toc}'}`);
+                        item['contentHtml'] = md.render(`${item.contentMd + '\n${toc}'}`);
 
                         // console.log(md.render(`${item.contentMd + '${toc}'}`));
                         item['userId'] = item.userId._id;
