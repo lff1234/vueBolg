@@ -14,21 +14,20 @@ function getToken() {
     return tokenObj;
 }
 
+function refreshToken() {
+    // instance是当前request.js中已创建的axios实例
+    return instance
+        .post('/api/refreshToken', {
+            name: window.sessionStorage.getItem('username') || store.state.currentUser,
+            _id: window.sessionStorage.getItem('logid') || store.state.logId
+        })
+        .then(res => res.data);
+}
+// 是否正在刷新的标记
+let isRefreshing = false;
+// 重试队列，每一项将是一个待执行的函数形式
+let requests = [];
 export function request(config) {
-    // 是否正在刷新的标记
-    let isRefreshing = false;
-    // 重试队列，每一项将是一个待执行的函数形式
-    let requests = [];
-
-    function refreshToken() {
-        // instance是当前request.js中已创建的axios实例
-        return instance
-            .post('/api/refreshToken', {
-                name: window.sessionStorage.getItem('username') || store.state.currentUser,
-                _id: window.sessionStorage.getItem('logid') || store.state.logId
-            })
-            .then(res => res.data);
-    }
     const instance = axios.create({
         baseURL: '',
         timeout: 10000
@@ -172,5 +171,7 @@ export function request(config) {
             }
         }
     );
+
+    console.log(count);
     return instance(config);
 }
